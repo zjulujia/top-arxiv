@@ -9,38 +9,34 @@
                 <p class="text-gray-600" data-oid=":_w4bwx">按引用量排序的学术论文关键词搜索</p>
             </div>
         </header>
-
         <!-- Search Section -->
         <div class="max-w-6xl mx-auto px-4 py-8" data-oid="pdvnyz.">
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-8" data-oid="daso_2q">
-                <div class="flex gap-4" data-oid="aunyibx">
+            <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8" data-oid="daso_2q">
+                <div class="flex flex-col sm:flex-row gap-4" data-oid="aunyibx">
                     <input
                         type="text"
                         v-model="searchQuery"
                         @keypress="handleKeyPress"
                         placeholder="输入关键词搜索论文..."
-                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         data-oid="bh.nsek"
                     />
-
                     <button
                         @click="handleSearch"
                         :disabled="isLoading"
-                        class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        class="px-6 sm:px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base whitespace-nowrap"
                         data-oid="c6mklyz"
                     >
                         {{ isLoading ? '搜索中...' : '搜索' }}
                     </button>
                 </div>
             </div>
-
             <!-- Results -->
             <div v-if="searchResults.length > 0" class="mb-4" data-oid="60hskwd">
                 <p class="text-gray-600" data-oid="rmpj.jr">
                     找到 {{ searchResults.length }} 篇论文，按引用量排序
                 </p>
             </div>
-
             <div class="space-y-6" data-oid="ai7x9l5">
                 <div
                     v-for="(paper, index) in searchResults"
@@ -83,19 +79,15 @@
                                     </span>
                                 </div>
                             </div>
-
                             <div
                                 class="flex items-center gap-2 text-sm text-gray-600 mb-3"
                                 data-oid="wtkigjo"
                             >
                                 <span class="font-medium" data-oid="q_ffur1">作者:</span>
-                                <p class="text-gray-700" data-oid="0o-kc8s">
-                                    {{ paper.authors }}
-                                </p>
+                                <p class="text-gray-700" data-oid="0o-kc8s">{{ paper.authors }}</p>
                             </div>
                         </div>
                     </div>
-
                     <!-- Abstract -->
                     <div class="mb-4" data-oid="tuu2qwh">
                         <h3 class="text-sm font-medium text-gray-800 mb-2" data-oid="ob:9u8u">
@@ -105,7 +97,6 @@
                             {{ truncateText(paper.abstract, 300) }}
                         </p>
                     </div>
-
                     <!-- Footer with keywords and date -->
                     <div
                         class="flex items-center justify-between pt-4 border-t border-gray-100"
@@ -143,7 +134,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- No results -->
             <div
                 v-if="searchQuery && searchResults.length === 0 && !isLoading"
@@ -153,7 +143,6 @@
                 <div class="text-gray-400 text-lg mb-2" data-oid="8w7bh8v">未找到相关论文</div>
                 <p class="text-gray-500" data-oid="2y02t84">请尝试其他关键词</p>
             </div>
-
             <!-- Loading -->
             <div v-if="isLoading" class="text-center py-12" data-oid="z-p-:bi">
                 <div
@@ -165,119 +154,6 @@
         </div>
     </div>
 </template>
-
 <script>
-export default {
-    name: 'App',
-    data() {
-        return {
-            searchQuery: '',
-            searchResults: [],
-            isLoading: false,
-            mockResults: [
-                {
-                    id: 1,
-                    title: 'Attention Is All You Need',
-                    authors:
-                        'Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin',
-                    abstract:
-                        'The dominant sequence transduction models are based on complex recurrent or convolutional neural networks...',
-                    citations: 45672,
-                    arxivId: '1706.03762',
-                    publishedDate: '2017-06-12',
-                    keywords: ['transformer', 'attention', 'neural networks', 'NLP'],
-                },
-                {
-                    id: 2,
-                    title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding',
-                    authors: 'Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova',
-                    abstract:
-                        'We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers...',
-                    citations: 38291,
-                    arxivId: '1810.04805',
-                    publishedDate: '2018-10-11',
-                    keywords: ['BERT', 'transformer', 'language model', 'pre-training'],
-                },
-                {
-                    id: 3,
-                    title: 'Deep Residual Learning for Image Recognition',
-                    authors: 'Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun',
-                    abstract:
-                        'Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training...',
-                    citations: 89234,
-                    arxivId: '1512.03385',
-                    publishedDate: '2015-12-10',
-                    keywords: ['ResNet', 'deep learning', 'computer vision', 'residual networks'],
-                },
-                {
-                    id: 4,
-                    title: 'Generative Adversarial Networks',
-                    authors:
-                        'Ian J. Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, Yoshua Bengio',
-                    abstract:
-                        'We propose a new framework for estimating generative models via an adversarial process...',
-                    citations: 67543,
-                    arxivId: '1406.2661',
-                    publishedDate: '2014-06-10',
-                    keywords: ['GAN', 'generative models', 'adversarial training', 'deep learning'],
-                },
-            ],
-        };
-    },
-    methods: {
-        handleSearch() {
-            if (!this.searchQuery.trim()) return;
-
-            this.isLoading = true;
-
-            // Simulate API call
-            setTimeout(() => {
-                // Filter and sort by citations (descending)
-                const filtered = this.mockResults
-                    .filter(
-                        (paper) =>
-                            paper.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                            paper.keywords.some((keyword) =>
-                                keyword.toLowerCase().includes(this.searchQuery.toLowerCase()),
-                            ) ||
-                            paper.abstract.toLowerCase().includes(this.searchQuery.toLowerCase()),
-                    )
-                    .sort((a, b) => b.citations - a.citations);
-
-                this.searchResults = filtered;
-                this.isLoading = false;
-            }, 1000);
-        },
-
-        handleKeyPress(e) {
-            if (e.key === 'Enter') {
-                this.handleSearch();
-            }
-        },
-
-        searchByKeyword(keyword) {
-            this.searchQuery = keyword;
-            this.handleSearch();
-        },
-
-        openArxivLink(arxivId) {
-            window.open(`https://arxiv.org/abs/${arxivId}`, '_blank');
-        },
-
-        formatNumber(num) {
-            return num.toLocaleString();
-        },
-
-        formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('zh-CN');
-        },
-
-        truncateText(text, maxLength) {
-            if (text.length > maxLength) {
-                return text.substring(0, maxLength) + '...';
-            }
-            return text;
-        },
-    },
-};
+export default { name: 'App', data() { return { searchQuery: '', searchResults: [], isLoading: false, mockResults: [ { id: 1, title: 'Attention Is All You Need', authors: 'Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin', abstract: 'The dominant sequence transduction models are based on complex recurrent or convolutional neural networks...', citations: 45672, arxivId: '1706.03762', publishedDate: '2017-06-12', keywords: ['transformer', 'attention', 'neural networks', 'NLP'], }, { id: 2, title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding', authors: 'Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova', abstract: 'We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers...', citations: 38291, arxivId: '1810.04805', publishedDate: '2018-10-11', keywords: ['BERT', 'transformer', 'language model', 'pre-training'], }, { id: 3, title: 'Deep Residual Learning for Image Recognition', authors: 'Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun', abstract: 'Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training...', citations: 89234, arxivId: '1512.03385', publishedDate: '2015-12-10', keywords: ['ResNet', 'deep learning', 'computer vision', 'residual networks'], }, { id: 4, title: 'Generative Adversarial Networks', authors: 'Ian J. Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, Yoshua Bengio', abstract: 'We propose a new framework for estimating generative models via an adversarial process...', citations: 67543, arxivId: '1406.2661', publishedDate: '2014-06-10', keywords: ['GAN', 'generative models', 'adversarial training', 'deep learning'], }, ], }; }, methods: { handleSearch() { if (!this.searchQuery.trim()) return; this.isLoading = true; // Simulate API call setTimeout(() => { // Filter and sort by citations (descending) const filtered = this.mockResults .filter( (paper) => paper.title.toLowerCase().includes(this.searchQuery.toLowerCase()) || paper.keywords.some((keyword) => keyword.toLowerCase().includes(this.searchQuery.toLowerCase()), ) || paper.abstract.toLowerCase().includes(this.searchQuery.toLowerCase()), ) .sort((a, b) => b.citations - a.citations); this.searchResults = filtered; this.isLoading = false; }, 1000); }, handleKeyPress(e) { if (e.key === 'Enter') { this.handleSearch(); } }, searchByKeyword(keyword) { this.searchQuery = keyword; this.handleSearch(); }, openArxivLink(arxivId) { window.open(`https://arxiv.org/abs/${arxivId}`, '_blank'); }, formatNumber(num) { return num.toLocaleString(); }, formatDate(dateString) { return new Date(dateString).toLocaleDateString('zh-CN'); }, truncateText(text, maxLength) { if (text.length > maxLength) { return text.substring(0, maxLength) + '...'; } return text; }, }, };
 </script>
