@@ -136,59 +136,132 @@ export default function Page() {
                 )}
 
                 <div className="space-y-6" data-oid="ai7x9l5">
-                    {searchResults.map((paper) => (
+                    {searchResults.map((paper, index) => (
                         <div
                             key={paper.id}
-                            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
+                            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all duration-200 border border-gray-100 hover:border-blue-200"
                             data-oid="1s4ktbq"
                         >
-                            <div
-                                className="flex justify-between items-start mb-3"
-                                data-oid="br07q6f"
-                            >
-                                <h2
-                                    className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer"
-                                    data-oid="r-a3beo"
-                                >
-                                    {paper.title}
-                                </h2>
+                            {/* Paper ranking and header */}
+                            <div className="flex items-start gap-4 mb-4" data-oid="br07q6f">
                                 <div
-                                    className="flex items-center gap-4 text-sm text-gray-500"
-                                    data-oid="bukciea"
+                                    className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-sm font-semibold"
+                                    data-oid="q-5mx.0"
                                 >
-                                    <span
-                                        className="bg-red-100 text-red-800 px-2 py-1 rounded"
-                                        data-oid="8ga0h2e"
+                                    {index + 1}
+                                </div>
+                                <div className="flex-1" data-oid="o.swj6p">
+                                    <div
+                                        className="flex justify-between items-start mb-2"
+                                        data-oid="moyadkx"
                                     >
-                                        引用: {paper.citations.toLocaleString()}
-                                    </span>
-                                    <span data-oid="_at780g">arXiv:{paper.arxivId}</span>
+                                        <h2
+                                            className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
+                                            data-oid="r-a3beo"
+                                            onClick={() =>
+                                                window.open(
+                                                    `https://arxiv.org/abs/${paper.arxivId}`,
+                                                    '_blank',
+                                                )
+                                            }
+                                        >
+                                            {paper.title}
+                                        </h2>
+                                        <div
+                                            className="flex items-center gap-3 text-sm text-gray-500 ml-4"
+                                            data-oid="bukciea"
+                                        >
+                                            <span
+                                                className="bg-red-100 text-red-800 px-3 py-1 rounded-full font-medium"
+                                                data-oid="8ga0h2e"
+                                            >
+                                                📊 {paper.citations.toLocaleString()}
+                                            </span>
+                                            <span
+                                                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-mono text-xs"
+                                                data-oid="_at780g"
+                                            >
+                                                arXiv:{paper.arxivId}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        className="flex items-center gap-2 text-sm text-gray-600 mb-3"
+                                        data-oid="wtkigjo"
+                                    >
+                                        <span className="font-medium" data-oid="q_ffur1">
+                                            作者:
+                                        </span>
+                                        <p className="text-gray-700" data-oid="0o-kc8s">
+                                            {paper.authors}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 
-                            <p className="text-gray-700 mb-3" data-oid="0o-kc8s">
-                                {paper.authors}
-                            </p>
+                            {/* Abstract */}
+                            <div className="mb-4" data-oid="tuu2qwh">
+                                <h3
+                                    className="text-sm font-medium text-gray-800 mb-2"
+                                    data-oid="ob:9u8u"
+                                >
+                                    摘要
+                                </h3>
+                                <p
+                                    className="text-gray-600 leading-relaxed text-sm"
+                                    data-oid=".40rzf3"
+                                >
+                                    {paper.abstract.length > 300
+                                        ? `${paper.abstract.substring(0, 300)}...`
+                                        : paper.abstract}
+                                </p>
+                            </div>
 
-                            <p className="text-gray-600 mb-4 leading-relaxed" data-oid=".40rzf3">
-                                {paper.abstract}
-                            </p>
-
-                            <div className="flex items-center justify-between" data-oid="vpgoq_h">
+                            {/* Footer with keywords and date */}
+                            <div
+                                className="flex items-center justify-between pt-4 border-t border-gray-100"
+                                data-oid="vpgoq_h"
+                            >
                                 <div className="flex flex-wrap gap-2" data-oid="rzi5b19">
-                                    {paper.keywords.map((keyword, index) => (
+                                    <span
+                                        className="text-sm font-medium text-gray-700 mr-2"
+                                        data-oid="..-da3x"
+                                    >
+                                        关键词:
+                                    </span>
+                                    {paper.keywords.map((keyword, keywordIndex) => (
                                         <span
-                                            key={index}
-                                            className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                                            key={keywordIndex}
+                                            className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md border border-blue-200 hover:bg-blue-100 cursor-pointer transition-colors"
                                             data-oid="yl-ij-z"
+                                            onClick={() => setSearchQuery(keyword)}
                                         >
-                                            {keyword}
+                                            #{keyword}
                                         </span>
                                     ))}
                                 </div>
-                                <span className="text-sm text-gray-500" data-oid="ysqbmx1">
-                                    发布日期: {paper.publishedDate}
-                                </span>
+                                <div
+                                    className="flex items-center gap-4 text-xs text-gray-500"
+                                    data-oid="y1tn13c"
+                                >
+                                    <span data-oid="ysqbmx1">
+                                        📅{' '}
+                                        {new Date(paper.publishedDate).toLocaleDateString('zh-CN')}
+                                    </span>
+                                    <button
+                                        className="text-blue-600 hover:text-blue-800 font-medium"
+                                        onClick={() =>
+                                            window.open(
+                                                `https://arxiv.org/abs/${paper.arxivId}`,
+                                                '_blank',
+                                            )
+                                        }
+                                        data-oid="el85325"
+                                    >
+                                        查看原文 →
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
