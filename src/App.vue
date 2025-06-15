@@ -78,14 +78,6 @@
             </div>
           </div>
 
-          <!-- Abstract -->
-          <div class="mb-4">
-            <h3 class="text-sm font-medium text-gray-800 mb-2">摘要</h3>
-            <p class="text-gray-600 leading-relaxed text-sm break-words">
-              {{ truncateText(paper.abstract, 300) }}
-            </p>
-          </div>
-
           <!-- Footer with keywords and date -->
           <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-4 border-t border-gray-100">
             <div class="flex flex-wrap gap-2">
