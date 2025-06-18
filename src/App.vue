@@ -3,8 +3,8 @@
         <!-- Header -->
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">每月论文排序</h1>
-                <p class="text-gray-600 text-sm sm:text-base">当月全部AI学术论文，按引用量排序</p>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Arxiv AI论文 排序</h1>
+                <p class="text-gray-600 text-sm sm:text-base">Arxiv当月全部AI学术论文，按引用量排序</p>
             </div>
         </header>
 
@@ -302,8 +302,8 @@ export default {
             totalPages: 1,
             pageSize: 100,
             startYear: 2020,
-            endYear: 2025,
-            endMonth: 5, // 2025年5月
+            endYear: new Date().getFullYear(),
+            endMonth: new Date().getMonth() + 1, // 当前月份
             // 模拟不同月份的论文数据
             papersByMonth: {
                 '2020-01': [
@@ -425,7 +425,8 @@ export default {
     computed: {
         availableYears() {
             const years = [];
-            for (let year = this.startYear; year <= this.endYear; year++) {
+            const currentYear = new Date().getFullYear();
+            for (let year = 2020; year <= currentYear; year++) {
                 years.push(year);
             }
             return years;
@@ -479,18 +480,29 @@ export default {
     methods: {
         isValidMonth(year, month) {
             // 检查月份是否在有效范围内
-            if (year < this.startYear || year > this.endYear) return false;
-            if (year === this.startYear && month < 1) return false;
-            if (year === this.endYear && month > this.endMonth) return false;
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+
+            // 不能早于2020年1月
+            if (year < 2020 || (year === 2020 && month < 1)) return false;
+
+            // 不能晚于当前年月
+            if (year > currentYear || (year === currentYear && month > currentMonth)) return false;
+
             return true;
         },
 
         getAvailableMonthsForYear(year) {
             if (!year) return [];
 
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
+
             const months = [];
-            const startMonth = year === this.startYear ? 1 : 1;
-            const endMonth = year === this.endYear ? this.endMonth : 12;
+            const startMonth = year === 2020 ? 1 : 1;
+            const endMonth = year === currentYear ? currentMonth : 12;
 
             for (let month = startMonth; month <= endMonth; month++) {
                 months.push(month);
@@ -737,8 +749,9 @@ export default {
             const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
             this.selectMonth(monthValue);
         } else {
-            // 选择最新的可用月份（2025年5月）
-            this.selectMonth('2025-05');
+            // 选择最新的可用月份（当前年月）
+            const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+            this.selectMonth(monthValue);
         }
     },
 };
