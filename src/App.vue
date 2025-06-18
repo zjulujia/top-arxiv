@@ -120,7 +120,7 @@
                             >
                                 <h2
                                     class="text-lg sm:text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors mb-2 lg:mb-0 lg:mr-4"
-                                    @click="openArxivLink(paper.arxivId)"
+                                    @click="openPaperLink(paper)"
                                 >
                                     {{ paper.title }}
                                 </h2>
@@ -172,7 +172,7 @@
                             <span>📅 {{ formatDate(paper.publishedDate) }}</span>
                             <button
                                 class="text-blue-600 hover:text-blue-800 font-medium text-left sm:text-center"
-                                @click="openArxivLink(paper.arxivId)"
+                                @click="openPaperLink(paper)"
                             >
                                 查看原文 →
                             </button>
@@ -181,9 +181,20 @@
                 </div>
             </div>
 
+            <!-- Error Message -->
+            <div
+                v-if="loadError && !isLoading"
+                class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
+            >
+                <div class="flex items-center">
+                    <div class="text-red-800"><strong>加载失败:</strong> {{ loadError }}</div>
+                </div>
+                <p class="text-red-600 text-sm mt-2">已尝试使用备用数据，如果问题持续请稍后重试</p>
+            </div>
+
             <!-- No results -->
             <div
-                v-if="selectedMonth && displayedPapers.length === 0 && !isLoading"
+                v-if="selectedMonth && displayedPapers.length === 0 && !isLoading && !loadError"
                 class="text-center py-12"
             >
                 <div class="text-gray-400 text-lg mb-2">
@@ -223,6 +234,7 @@ export default {
             monthlyPapers: [],
             displayedPapers: [],
             isLoading: false,
+            loadError: null,
             startYear: 2020,
             endYear: 2025,
             endMonth: 5, // 2025年5月
@@ -434,17 +446,57 @@ export default {
             this.filterKeyword = '';
         },
 
-        loadMonthlyPapers() {
+        async loadMonthlyPapers() {
             this.isLoading = true;
+            this.loadError = null;
 
-            // Simulate API call
-            setTimeout(() => {
-                this.monthlyPapers = (this.papersByMonth[this.selectedMonth] || []).sort(
-                    (a, b) => b.citations - a.citations,
-                );
-                this.displayedPapers = [...this.monthlyPapers];
-                this.isLoading = false;
-            }, 500);
+            try {
+                // 将 YYYY-MM 格式转换为 YYYYMM 格式
+                const monthParam = this.selectedMonth.replace('-', '');
+                const response = await fetch(`http://125.34.17.225:9300/meta/${monthParam}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result.ret === 'ok' && result.data) {
+                    // 转换API数据格式为组件需要的格式
+                    this.monthlyPapers = result.data
+                        .map((paper, index) => ({
+                            id: index + 1,
+                            title: paper.title,
+                            authors: paper.authors,
+                            citations: paper.citations,
+                            arxivId: this.extractArxivId(paper.url),
+                            publishedDate: this.formatPublishedDate(paper.publishedMonth),
+                            keywords: paper.keywords || [],
+                            url: paper.url,
+                        }))
+                        .sort((a, b) => b.citations - a.citations);
+
+                    this.displayedPapers = [...this.monthlyPapers];
+                } else {
+                    throw new Error('API返回数据格式错误');
+                }
+            } catch (error) {
+                console.error('获取论文数据失败:', error);
+                this.loadError = error.message;
+
+                // 如果API请求失败，使用本地模拟数据作为备用
+                const fallbackData = this.papersByMonth[this.selectedMonth] || [];
+                if (fallbackData.length > 0) {
+                    this.monthlyPapers = fallbackData.sort((a, b) => b.citations - a.citations);
+                    this.displayedPapers = [...this.monthlyPapers];
+                    this.loadError = null; // 清除错误，因为有备用数据
+                } else {
+                    this.monthlyPapers = [];
+                    this.displayedPapers = [];
+                }
+            }
+
+            this.isLoading = false;
         },
 
         filterPapers() {
@@ -478,6 +530,32 @@ export default {
 
         formatNumber(num) {
             return num.toLocaleString();
+        },
+
+        extractArxivId(url) {
+            // 从URL中提取arXiv ID
+            // 例如: https://arxiv.org/pdf/2506.01939 -> 2506.01939
+            const match = url.match(/arxiv\.org\/pdf\/([^\/]+)/);
+            return match ? match[1] : '';
+        },
+
+        formatPublishedDate(publishedMonth) {
+            // 将 YYYYMM 格式转换为 YYYY-MM-01 格式
+            if (publishedMonth && publishedMonth.length === 6) {
+                const year = publishedMonth.substring(0, 4);
+                const month = publishedMonth.substring(4, 6);
+                return `${year}-${month}-01`;
+            }
+            return '';
+        },
+
+        openPaperLink(paper) {
+            // 优先使用paper.url，如果没有则使用arxivId构建链接
+            if (paper.url) {
+                window.open(paper.url, '_blank');
+            } else if (paper.arxivId) {
+                window.open(`https://arxiv.org/abs/${paper.arxivId}`, '_blank');
+            }
         },
 
         formatDate(dateString) {
