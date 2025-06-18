@@ -145,7 +145,7 @@
                             >
                                 <span class="font-medium">作者:</span>
                                 <p class="text-gray-700 break-words">
-                                    {{ paper.authors }}
+                                    {{ truncateAuthors(paper.authors, 100) }}
                                 </p>
                             </div>
                         </div>
@@ -713,6 +713,13 @@ export default {
 
         goToNextPage() {
             this.changePage(this.currentPage + 1);
+        },
+
+        truncateAuthors(authors, maxLength) {
+            if (!authors || authors.length <= maxLength) {
+                return authors;
+            }
+            return authors.substring(0, maxLength) + '...';
         },
 
         formatDate(dateString) {
