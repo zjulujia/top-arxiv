@@ -112,7 +112,7 @@
                         <div
                             class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold"
                         >
-                            {{ index + 1 }}
+                            {{ (currentPage - 1) * pageSize + index + 1 }}
                         </div>
                         <div class="flex-1 min-w-0">
                             <div
