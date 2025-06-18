@@ -92,7 +92,7 @@
             <div v-if="displayedPapers.length > 0" class="mb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                     <p class="text-gray-600 mb-2 sm:mb-0">
-                        {{ selectedMonthLabel }} 共 {{ monthlyPapers.length }} 篇论文
+                        {{ selectedMonthLabel }} 第 {{ currentPage }} 页，共 {{ totalPages }} 页
                         <span v-if="filterKeyword" class="text-blue-600">
                             （过滤后显示 {{ displayedPapers.length }} 篇）
                         </span>
@@ -181,6 +181,69 @@
                 </div>
             </div>
 
+            <!-- Pagination -->
+            <div v-if="totalPages > 1 && !isLoading" class="mt-8 flex justify-center">
+                <nav class="flex items-center space-x-2">
+                    <!-- First Page -->
+                    <button
+                        @click="goToFirstPage"
+                        :disabled="currentPage === 1"
+                        class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        首页
+                    </button>
+
+                    <!-- Previous Page -->
+                    <button
+                        @click="goToPrevPage"
+                        :disabled="currentPage === 1"
+                        class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        上一页
+                    </button>
+
+                    <!-- Page Numbers -->
+                    <div class="flex items-center space-x-1">
+                        <button
+                            v-for="page in visiblePages"
+                            :key="page"
+                            @click="changePage(page)"
+                            :class="[
+                                'px-3 py-2 text-sm font-medium rounded-md',
+                                page === currentPage
+                                    ? 'bg-blue-600 text-white'
+                                    : 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50',
+                            ]"
+                        >
+                            {{ page }}
+                        </button>
+                    </div>
+
+                    <!-- Next Page -->
+                    <button
+                        @click="goToNextPage"
+                        :disabled="currentPage === totalPages"
+                        class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        下一页
+                    </button>
+
+                    <!-- Last Page -->
+                    <button
+                        @click="goToLastPage"
+                        :disabled="currentPage === totalPages"
+                        class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        末页
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Page Info -->
+            <div v-if="totalPages > 1 && !isLoading" class="mt-4 text-center text-sm text-gray-500">
+                第 {{ currentPage }} 页，共 {{ totalPages }} 页
+            </div>
+
             <!-- Error Message -->
             <div
                 v-if="loadError && !isLoading"
@@ -235,6 +298,9 @@ export default {
             displayedPapers: [],
             isLoading: false,
             loadError: null,
+            currentPage: 1,
+            totalPages: 1,
+            pageSize: 100,
             startYear: 2020,
             endYear: 2025,
             endMonth: 5, // 2025年5月
@@ -390,6 +456,25 @@ export default {
 
             return months;
         },
+
+        visiblePages() {
+            const pages = [];
+            const maxVisible = 5; // 最多显示5个页码
+
+            let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+            let end = Math.min(this.totalPages, start + maxVisible - 1);
+
+            // 调整起始位置，确保显示足够的页码
+            if (end - start + 1 < maxVisible) {
+                start = Math.max(1, end - maxVisible + 1);
+            }
+
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+
+            return pages;
+        },
     },
     methods: {
         isValidMonth(year, month) {
@@ -419,6 +504,8 @@ export default {
             this.selectedMonth = '';
             this.monthlyPapers = [];
             this.displayedPapers = [];
+            this.currentPage = 1;
+            this.totalPages = 1;
         },
 
         onMonthChange() {
@@ -434,6 +521,8 @@ export default {
             this.selectedYear = parseInt(year);
             this.selectedMonthOnly = parseInt(month);
             this.filterKeyword = '';
+            this.currentPage = 1;
+            this.totalPages = 1;
             this.loadMonthlyPapers();
         },
 
@@ -453,33 +542,12 @@ export default {
             try {
                 // 将 YYYY-MM 格式转换为 YYYYMM 格式
                 const monthParam = this.selectedMonth.replace('-', '');
-                const response = await fetch(`http://125.34.17.225:9300/meta/${monthParam}`);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                // 首先获取总页数
+                await this.loadTotalPages(monthParam);
 
-                const result = await response.json();
-
-                if (result.ret === 'ok' && result.data) {
-                    // 转换API数据格式为组件需要的格式
-                    this.monthlyPapers = result.data
-                        .map((paper, index) => ({
-                            id: index + 1,
-                            title: paper.title,
-                            authors: paper.authors,
-                            citations: paper.citations,
-                            arxivId: this.extractArxivId(paper.url),
-                            publishedDate: this.formatPublishedDate(paper.publishedMonth),
-                            keywords: paper.keywords || [],
-                            url: paper.url,
-                        }))
-                        .sort((a, b) => b.citations - a.citations);
-
-                    this.displayedPapers = [...this.monthlyPapers];
-                } else {
-                    throw new Error('API返回数据格式错误');
-                }
+                // 然后加载当前页的数据
+                await this.loadPageData(monthParam, this.currentPage);
             } catch (error) {
                 console.error('获取论文数据失败:', error);
                 this.loadError = error.message;
@@ -489,14 +557,64 @@ export default {
                 if (fallbackData.length > 0) {
                     this.monthlyPapers = fallbackData.sort((a, b) => b.citations - a.citations);
                     this.displayedPapers = [...this.monthlyPapers];
+                    this.totalPages = 1;
+                    this.currentPage = 1;
                     this.loadError = null; // 清除错误，因为有备用数据
                 } else {
                     this.monthlyPapers = [];
                     this.displayedPapers = [];
+                    this.totalPages = 1;
+                    this.currentPage = 1;
                 }
             }
 
             this.isLoading = false;
+        },
+
+        async loadTotalPages(monthParam) {
+            const response = await fetch(`http://125.34.17.225:9300/page_num/${monthParam}/`);
+
+            if (!response.ok) {
+                throw new Error(`获取页数失败! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.ret === 'ok' && typeof result.data === 'number') {
+                this.totalPages = Math.max(1, result.data);
+            } else {
+                throw new Error('页数API返回数据格式错误');
+            }
+        },
+
+        async loadPageData(monthParam, page) {
+            const response = await fetch(`http://125.34.17.225:9300/meta/${monthParam}/${page}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (result.ret === 'ok' && result.data) {
+                // 转换API数据格式为组件需要的格式
+                this.monthlyPapers = result.data
+                    .map((paper, index) => ({
+                        id: (page - 1) * this.pageSize + index + 1,
+                        title: paper.title,
+                        authors: paper.authors,
+                        citations: paper.citations,
+                        arxivId: this.extractArxivId(paper.url),
+                        publishedDate: this.formatPublishedDate(paper.publishedMonth),
+                        keywords: paper.keywords || [],
+                        url: paper.url,
+                    }))
+                    .sort((a, b) => b.citations - a.citations);
+
+                this.displayedPapers = [...this.monthlyPapers];
+            } else {
+                throw new Error('API返回数据格式错误');
+            }
         },
 
         filterPapers() {
@@ -556,6 +674,45 @@ export default {
             } else if (paper.arxivId) {
                 window.open(`https://arxiv.org/abs/${paper.arxivId}`, '_blank');
             }
+        },
+
+        async changePage(page) {
+            if (page < 1 || page > this.totalPages || page === this.currentPage) {
+                return;
+            }
+
+            this.currentPage = page;
+            this.isLoading = true;
+            this.loadError = null;
+
+            try {
+                const monthParam = this.selectedMonth.replace('-', '');
+                await this.loadPageData(monthParam, page);
+
+                // 重新应用过滤
+                this.filterPapers();
+            } catch (error) {
+                console.error('切换页面失败:', error);
+                this.loadError = error.message;
+            }
+
+            this.isLoading = false;
+        },
+
+        goToFirstPage() {
+            this.changePage(1);
+        },
+
+        goToLastPage() {
+            this.changePage(this.totalPages);
+        },
+
+        goToPrevPage() {
+            this.changePage(this.currentPage - 1);
+        },
+
+        goToNextPage() {
+            this.changePage(this.currentPage + 1);
         },
 
         formatDate(dateString) {
