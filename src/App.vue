@@ -3,9 +3,9 @@
         <!-- Header -->
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">每月论文推荐</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">每月论文排序</h1>
                 <p class="text-gray-600 text-sm sm:text-base">
-                    精选当月最优质的学术论文，按引用量排序
+                    当月全部AI学术论文，按引用量排序
                 </p>
             </div>
         </header>
@@ -15,8 +15,6 @@
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
                 <!-- Month Selection -->
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-3">选择月份</label>
-
                     <!-- Year and Month Selectors -->
                     <div class="flex flex-col sm:flex-row gap-4 mb-4">
                         <div class="flex-1">
@@ -53,25 +51,6 @@
                         </div>
                     </div>
 
-                    <!-- Current Selection Display -->
-                    <div
-                        v-if="selectedMonth"
-                        class="bg-blue-50 border border-blue-200 rounded-lg p-3"
-                    >
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="text-blue-800 font-medium">当前选择:</span>
-                                <span class="text-blue-700">{{ selectedMonthLabel }}</span>
-                            </div>
-                            <button
-                                @click="clearMonthSelection"
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
-                                重新选择
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Quick Selection for Recent Months -->
                     <div v-if="!selectedMonth" class="mt-4">
                         <label class="block text-xs text-gray-500 mb-2"
@@ -92,9 +71,6 @@
 
                 <!-- Keyword Filter -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3"
-                        >关键词过滤（可选）</label
-                    >
                     <div class="flex flex-col sm:flex-row gap-4">
                         <input
                             type="text"
