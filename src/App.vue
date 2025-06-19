@@ -77,13 +77,12 @@
                 </div>
             </div>
 
-            <!-- Results -->
-            <div v-if="displayedPapers.length > 0" class="mb-4">
+            <!-- Results --<div v-if="displayedPapers.length > 0" class="mb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                     <p class="text-gray-600 mb-2 sm:mb-0">
                         {{ selectedMonthLabel }} 第 {{ currentPage }} 页，共 {{ totalPages }} 页
                         <span v-if="filterKeyword" class="text-blue-600">
-                            （过滤后显示 {{ displayedPapers.length }} 篇）
+                            （过滤后共 {{ filteredPapers.length }} 篇）
                         </span>
                     </p>
                     <div class="text-sm text-gray-500">按引用量排序</div>
@@ -282,8 +281,8 @@ export default {
             selectedMonthOnly: '',
             filterKeyword: '',
             allMonthlyPapers: [], // 存储该月的全部论文数据
-            monthlyPapers: [], // 当前页的论文数据
-            displayedPapers: [], // 过滤后显示的数据
+            filteredPapers: [], // 关键词过滤后的全部数据
+            displayedPapers: [], // 当前页显示的数据
             isLoading: false,
             loadError: null,
             currentPage: 1,
@@ -505,33 +504,45 @@ export default {
         },
 
         calculateTotalPages() {
-            this.totalPages = Math.max(1, Math.ceil(this.allMonthlyPapers.length / this.pageSize));
+            // 基于过滤后的数据计算总页数
+            const dataLength = this.filterKeyword.trim() ? this.filteredPapers.length : this.allMonthlyPapers.length;
+            this.totalPages = Math.max(1, Math.ceil(dataLength / this.pageSize));
         },
 
         updateCurrentPageData() {
             const startIndex = (this.currentPage - 1) * this.pageSize;
             const endIndex = startIndex + this.pageSize;
 
-            // 从全部数据中截取当前页的数据，直接使用后端返回的id
-            this.monthlyPapers = this.allMonthlyPapers.slice(startIndex, endIndex);
-
-            // 应用关键词过滤
-            this.filterPapers();
+            // 根据是否有关键词过滤来选择数据源
+            const sourceData = this.filterKeyword.trim() ? this.filteredPapers : this.allMonthlyPapers;
+            
+            // 从数据源中截取当前页的数据
+            this.displayedPapers = sourceData.slice(startIndex, endIndex);
         },
 
         filterPapers() {
             if (!this.filterKeyword.trim()) {
-                this.displayedPapers = [...this.monthlyPapers];
+                // 没有关键词时，清空过滤结果
+                this.filteredPapers = [];
+                this.currentPage = 1;
+                this.calculateTotalPages();
+                this.updateCurrentPageData();
                 return;
             }
 
             const keyword = this.filterKeyword.toLowerCase();
-            this.displayedPapers = this.monthlyPapers.filter(
+            // 在全部论文中进行搜索
+            this.filteredPapers = this.allMonthlyPapers.filter(
                 (paper) =>
                     paper.title.toLowerCase().includes(keyword) ||
                     paper.authors.toLowerCase().includes(keyword) ||
                     paper.keywords.some((k) => k.toLowerCase().includes(keyword)),
             );
+
+            // 重置到第一页并重新计算分页
+            this.currentPage = 1;
+            this.calculateTotalPages();
+            this.updateCurrentPageData();
         },
 
         filterByKeyword(keyword) {
@@ -541,7 +552,10 @@ export default {
 
         clearFilter() {
             this.filterKeyword = '';
-            this.displayedPapers = [...this.monthlyPapers];
+            this.filteredPapers = [];
+            this.currentPage = 1;
+            this.calculateTotalPages();
+            this.updateCurrentPageData();
         },
 
         changePage(page) {
