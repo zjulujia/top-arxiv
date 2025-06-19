@@ -488,19 +488,17 @@ export default {
             const result = await response.json();
 
             if (result.ret === 'ok' && result.data) {
-                // 转换API数据格式为组件需要的格式，并按引用量排序
-                this.allMonthlyPapers = result.data
-                    .map((paper, index) => ({
-                        id: index + 1,
-                        title: paper.title,
-                        authors: paper.authors,
-                        citations: paper.citations,
-                        arxivId: this.extractArxivId(paper.url),
-                        publishedDate: this.formatPublishedDate(paper.publishedMonth),
-                        keywords: paper.keywords || [],
-                        url: paper.url,
-                    }))
-                    .sort((a, b) => b.citations - a.citations);
+                // 转换API数据格式为组件需要的格式，后端已按引用量排序，直接使用后端返回的id
+                this.allMonthlyPapers = result.data.map((paper) => ({
+                    id: paper.id,
+                    title: paper.title,
+                    authors: paper.authors,
+                    citations: paper.citations,
+                    arxivId: this.extractArxivId(paper.url),
+                    publishedDate: this.formatPublishedDate(paper.publishedMonth),
+                    keywords: paper.keywords || [],
+                    url: paper.url,
+                }));
             } else {
                 throw new Error('API返回数据格式错误');
             }
@@ -514,14 +512,8 @@ export default {
             const startIndex = (this.currentPage - 1) * this.pageSize;
             const endIndex = startIndex + this.pageSize;
 
-            // 从全部数据中截取当前页的数据
+            // 从全部数据中截取当前页的数据，直接使用后端返回的id
             this.monthlyPapers = this.allMonthlyPapers.slice(startIndex, endIndex);
-
-            // 重新设置ID为绝对编号
-            this.monthlyPapers = this.monthlyPapers.map((paper, index) => ({
-                ...paper,
-                id: startIndex + index + 1,
-            }));
 
             // 应用关键词过滤
             this.filterPapers();
