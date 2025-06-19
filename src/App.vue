@@ -12,7 +12,6 @@
                     </p>
                 </div>
             </header>
-
             <!-- Control Section -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
@@ -38,7 +37,6 @@
                                     </option>
                                 </select>
                             </div>
-
                             <!-- Month Buttons -->
                             <div v-if="selectedYear" class="flex-1">
                                 <label class="block text-xs text-gray-500 mb-2">月份</label>
@@ -62,7 +60,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Keyword Filter -->
                     <div>
                         <div class="flex flex-col sm:flex-row gap-4">
@@ -83,7 +80,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Results -->
                 <div v-if="displayedPapers.length > 0" class="mb-4">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
@@ -96,7 +92,6 @@
                         <div class="text-sm text-gray-500">按引用量排序</div>
                     </div>
                 </div>
-
                 <div class="space-y-6">
                     <div
                         v-for="(paper, index) in displayedPapers"
@@ -108,7 +103,7 @@
                             <div
                                 class="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold"
                             >
-                                {{ (currentPage - 1) * pageSize + index + 1 }}
+                                {{ paper.id }}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-start gap-4 mb-2">
@@ -133,7 +128,6 @@
                                         </span>
                                     </div>
                                 </div>
-
                                 <div
                                     class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-gray-600 mb-3"
                                 >
@@ -144,7 +138,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- Footer with keywords and date -->
                         <div
                             class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-4 border-t border-gray-100"
@@ -174,7 +167,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Pagination -->
                 <div v-if="totalPages > 1 && !isLoading" class="mt-8 flex justify-center">
                     <nav class="flex items-center space-x-2">
@@ -186,7 +178,6 @@
                         >
                             首页
                         </button>
-
                         <!-- Previous Page -->
                         <button
                             @click="goToPrevPage"
@@ -195,7 +186,6 @@
                         >
                             上一页
                         </button>
-
                         <!-- Page Numbers -->
                         <div class="flex items-center space-x-1">
                             <button
@@ -212,7 +202,6 @@
                                 {{ page }}
                             </button>
                         </div>
-
                         <!-- Next Page -->
                         <button
                             @click="goToNextPage"
@@ -221,7 +210,6 @@
                         >
                             下一页
                         </button>
-
                         <!-- Last Page -->
                         <button
                             @click="goToLastPage"
@@ -232,7 +220,6 @@
                         </button>
                     </nav>
                 </div>
-
                 <!-- Page Info -->
                 <div
                     v-if="totalPages > 1 && !isLoading"
@@ -240,7 +227,6 @@
                 >
                     第 {{ currentPage }} 页，共 {{ totalPages }} 页
                 </div>
-
                 <!-- Error Message -->
                 <div
                     v-if="loadError && !isLoading"
@@ -253,7 +239,6 @@
                         已尝试使用备用数据，如果问题持续请稍后重试
                     </p>
                 </div>
-
                 <!-- No results -->
                 <div
                     v-if="selectedMonth && displayedPapers.length === 0 && !isLoading && !loadError"
@@ -266,13 +251,11 @@
                         {{ filterKeyword ? '请尝试其他关键词或选择其他月份' : '请选择其他月份' }}
                     </p>
                 </div>
-
                 <!-- No month selected -->
                 <div v-if="!selectedMonth" class="text-center py-12">
                     <div class="text-gray-400 text-lg mb-2">请选择月份</div>
                     <p class="text-gray-500">选择一个月份来查看该月的推荐论文</p>
                 </div>
-
                 <!-- Loading -->
                 <div v-if="isLoading" class="text-center py-12">
                     <div
@@ -284,394 +267,6 @@
         </div>
     </div>
 </template>
-
 <script>
-export default {
-    name: 'App',
-    data() {
-        return {
-            selectedMonth: '',
-            selectedYear: '',
-            selectedMonthOnly: '',
-            filterKeyword: '',
-            allMonthlyPapers: [], // 存储该月的全部论文数据
-            filteredPapers: [], // 关键词过滤后的全部数据
-            displayedPapers: [], // 当前页显示的数据
-            isLoading: false,
-            loadError: null,
-            currentPage: 1,
-            totalPages: 1,
-            pageSize: 100,
-            startYear: 2020,
-            endYear: new Date().getFullYear(),
-            endMonth: new Date().getMonth() + 1, // 当前月份
-            // 模拟不同月份的论文数据
-            papersByMonth: {
-                '2020-01': [
-                    {
-                        id: 101,
-                        title: 'Language Models are Unsupervised Multitask Learners',
-                        authors:
-                            'Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever',
-                        citations: 12543,
-                        arxivId: '1909.08593',
-                        publishedDate: '2020-01-15',
-                        keywords: ['GPT-2', 'language model', 'unsupervised learning', 'NLP'],
-                    },
-                ],
-                '2024-01': [
-                    {
-                        id: 1,
-                        title: 'Attention Is All You Need',
-                        authors:
-                            'Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin',
-                        citations: 45672,
-                        arxivId: '1706.03762',
-                        publishedDate: '2024-01-15',
-                        keywords: ['transformer', 'attention', 'neural networks', 'NLP'],
-                    },
-                    {
-                        id: 2,
-                        title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding',
-                        authors: 'Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova',
-                        citations: 38291,
-                        arxivId: '1810.04805',
-                        publishedDate: '2024-01-22',
-                        keywords: ['BERT', 'transformer', 'language model', 'pre-training'],
-                    },
-                ],
-            },
-        };
-    },
-    computed: {
-        availableYears() {
-            const years = [];
-            const currentYear = new Date().getFullYear();
-            for (let year = 2020; year <= currentYear; year++) {
-                years.push(year);
-            }
-            return years;
-        },
-
-        selectedMonthLabel() {
-            if (!this.selectedMonth) return '';
-            const [year, month] = this.selectedMonth.split('-');
-            return `${year}年${parseInt(month)}月`;
-        },
-
-        visiblePages() {
-            const pages = [];
-            const maxVisible = 5; // 最多显示5个页码
-
-            let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
-            let end = Math.min(this.totalPages, start + maxVisible - 1);
-
-            // 调整起始位置，确保显示足够的页码
-            if (end - start + 1 < maxVisible) {
-                start = Math.max(1, end - maxVisible + 1);
-            }
-
-            for (let i = start; i <= end; i++) {
-                pages.push(i);
-            }
-
-            return pages;
-        },
-    },
-    methods: {
-        isValidMonth(year, month) {
-            // 检查月份是否在有效范围内
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth() + 1;
-
-            // 不能早于2020年1月
-            if (year < 2020 || (year === 2020 && month < 1)) return false;
-
-            // 不能晚于当前年月
-            if (year > currentYear || (year === currentYear && month > currentMonth)) return false;
-
-            return true;
-        },
-
-        getAvailableMonthsForYear(year) {
-            if (!year) return [];
-
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentMonth = now.getMonth() + 1;
-
-            const months = [];
-            const startMonth = year === 2020 ? 1 : 1;
-            const endMonth = year === currentYear ? currentMonth : 12;
-
-            for (let month = startMonth; month <= endMonth; month++) {
-                months.push(month);
-            }
-
-            return months;
-        },
-
-        onYearChange() {
-            this.selectedMonthOnly = '';
-            this.selectedMonth = '';
-            this.allMonthlyPapers = [];
-            this.filteredPapers = [];
-            this.displayedPapers = [];
-            this.currentPage = 1;
-            this.totalPages = 1;
-
-            // 默认选择12月（如果12月可用的话）
-            if (this.selectedYear) {
-                const availableMonths = this.getAvailableMonthsForYear(this.selectedYear);
-                if (availableMonths.includes(12)) {
-                    this.selectMonthOnly(12);
-                } else if (availableMonths.length > 0) {
-                    // 如果12月不可用，选择该年份的最后一个可用月份
-                    this.selectMonthOnly(availableMonths[availableMonths.length - 1]);
-                }
-            }
-        },
-
-        selectMonthOnly(month) {
-            this.selectedMonthOnly = month;
-            if (this.selectedYear && month) {
-                const monthValue = `${this.selectedYear}-${month.toString().padStart(2, '0')}`;
-                this.selectMonth(monthValue);
-            }
-        },
-
-        selectMonth(monthValue) {
-            this.selectedMonth = monthValue;
-            const [year, month] = monthValue.split('-');
-            this.selectedYear = parseInt(year);
-            this.selectedMonthOnly = parseInt(month);
-            // 不清除关键词，保留用户的搜索条件
-            this.currentPage = 1;
-            this.totalPages = 1;
-            this.loadMonthlyPapers();
-        },
-
-        async loadMonthlyPapers() {
-            this.isLoading = true;
-            this.loadError = null;
-
-            try {
-                // 将 YYYY-MM 格式转换为 YYYYMM 格式
-                const monthParam = this.selectedMonth.replace('-', '');
-
-                // 一次性加载该月的全部数据
-                await this.loadAllMonthData(monthParam);
-
-                // 如果有关键词，在新数据加载完成后重新应用过滤
-                if (this.filterKeyword.trim()) {
-                    this.filterPapers();
-                } else {
-                    // 没有关键词时，正常计算分页和显示数据
-                    this.calculateTotalPages();
-                    this.updateCurrentPageData();
-                }
-            } catch (error) {
-                console.error('获取论文数据失败:', error);
-                this.loadError = error.message;
-
-                // 如果API请求失败，使用本地模拟数据作为备用
-                const fallbackData = this.papersByMonth[this.selectedMonth] || [];
-                if (fallbackData.length > 0) {
-                    this.allMonthlyPapers = fallbackData.sort((a, b) => b.citations - a.citations);
-
-                    // 如果有关键词，重新应用过滤
-                    if (this.filterKeyword.trim()) {
-                        this.filterPapers();
-                    } else {
-                        this.calculateTotalPages();
-                        this.updateCurrentPageData();
-                    }
-                    this.loadError = null; // 清除错误，因为有备用数据
-                } else {
-                    this.allMonthlyPapers = [];
-                    this.filteredPapers = [];
-                    this.displayedPapers = [];
-                    this.totalPages = 1;
-                    this.currentPage = 1;
-                }
-            }
-
-            this.isLoading = false;
-        },
-
-        async loadAllMonthData(monthParam) {
-            const response = await fetch(`http://125.34.17.225:9300/meta/${monthParam}`);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-
-            if (result.ret === 'ok' && result.data) {
-                // 转换API数据格式为组件需要的格式，后端已按引用量排序，直接使用后端返回的id
-                this.allMonthlyPapers = result.data.map((paper) => ({
-                    id: paper.id,
-                    title: paper.title,
-                    authors: paper.authors,
-                    citations: paper.citations,
-                    arxivId: this.extractArxivId(paper.url),
-                    publishedDate: this.formatPublishedDate(paper.publishedMonth),
-                    keywords: paper.keywords || [],
-                    url: paper.url,
-                }));
-            } else {
-                throw new Error('API返回数据格式错误');
-            }
-        },
-
-        calculateTotalPages() {
-            // 基于过滤后的数据计算总页数
-            const dataLength = this.filterKeyword.trim()
-                ? this.filteredPapers.length
-                : this.allMonthlyPapers.length;
-            this.totalPages = Math.max(1, Math.ceil(dataLength / this.pageSize));
-        },
-
-        updateCurrentPageData() {
-            const startIndex = (this.currentPage - 1) * this.pageSize;
-            const endIndex = startIndex + this.pageSize;
-
-            // 根据是否有关键词过滤来选择数据源
-            const sourceData = this.filterKeyword.trim()
-                ? this.filteredPapers
-                : this.allMonthlyPapers;
-
-            // 从数据源中截取当前页的数据
-            this.displayedPapers = sourceData.slice(startIndex, endIndex);
-        },
-
-        filterPapers() {
-            if (!this.filterKeyword.trim()) {
-                // 没有关键词时，清空过滤结果
-                this.filteredPapers = [];
-                this.currentPage = 1;
-                this.calculateTotalPages();
-                this.updateCurrentPageData();
-                return;
-            }
-
-            const keyword = this.filterKeyword.toLowerCase();
-            // 在全部论文中进行搜索
-            this.filteredPapers = this.allMonthlyPapers.filter(
-                (paper) =>
-                    paper.title.toLowerCase().includes(keyword) ||
-                    paper.authors.toLowerCase().includes(keyword) ||
-                    paper.keywords.some((k) => k.toLowerCase().includes(keyword)),
-            );
-
-            // 重置到第一页并重新计算分页
-            this.currentPage = 1;
-            this.calculateTotalPages();
-            this.updateCurrentPageData();
-        },
-
-        filterByKeyword(keyword) {
-            this.filterKeyword = keyword;
-            this.filterPapers();
-        },
-
-        clearFilter() {
-            this.filterKeyword = '';
-            this.filteredPapers = [];
-            this.currentPage = 1;
-            this.calculateTotalPages();
-            this.updateCurrentPageData();
-        },
-
-        changePage(page) {
-            if (page < 1 || page > this.totalPages || page === this.currentPage) {
-                return;
-            }
-
-            this.currentPage = page;
-
-            // 前端分页，无需API请求
-            this.updateCurrentPageData();
-        },
-
-        goToFirstPage() {
-            this.changePage(1);
-        },
-
-        goToLastPage() {
-            this.changePage(this.totalPages);
-        },
-
-        goToPrevPage() {
-            this.changePage(this.currentPage - 1);
-        },
-
-        goToNextPage() {
-            this.changePage(this.currentPage + 1);
-        },
-
-        openArxivLink(arxivId) {
-            window.open(`https://arxiv.org/abs/${arxivId}`, '_blank');
-        },
-
-        formatNumber(num) {
-            return num.toLocaleString();
-        },
-
-        extractArxivId(url) {
-            // 从URL中提取arXiv ID
-            // 例如: https://arxiv.org/pdf/2506.01939 -> 2506.01939
-            const match = url.match(/arxiv\.org\/pdf\/([^\/]+)/);
-            return match ? match[1] : '';
-        },
-
-        formatPublishedDate(publishedMonth) {
-            // 将 YYYYMM 格式转换为 YYYY-MM-01 格式
-            if (publishedMonth && publishedMonth.length === 6) {
-                const year = publishedMonth.substring(0, 4);
-                const month = publishedMonth.substring(4, 6);
-                return `${year}-${month}-01`;
-            }
-            return '';
-        },
-
-        openPaperLink(paper) {
-            // 优先使用paper.url，如果没有则使用arxivId构建链接
-            if (paper.url) {
-                window.open(paper.url, '_blank');
-            } else if (paper.arxivId) {
-                window.open(`https://arxiv.org/abs/${paper.arxivId}`, '_blank');
-            }
-        },
-
-        truncateAuthors(authors, maxLength) {
-            if (!authors || authors.length <= maxLength) {
-                return authors;
-            }
-            return authors.substring(0, maxLength) + '...';
-        },
-
-        formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('zh-CN');
-        },
-    },
-
-    mounted() {
-        // 默认选择当前月份或最新可用月份
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
-
-        if (this.isValidMonth(currentYear, currentMonth)) {
-            const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
-            this.selectMonth(monthValue);
-        } else {
-            // 选择最新的可用月份（当前年月）
-            const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
-            this.selectMonth(monthValue);
-        }
-    },
-};
+export default { name: 'App', data() { return { selectedMonth: '', selectedYear: '', selectedMonthOnly: '', filterKeyword: '', allMonthlyPapers: [], // 存储该月的全部论文数据 filteredPapers: [], // 关键词过滤后的全部数据 displayedPapers: [], // 当前页显示的数据 isLoading: false, loadError: null, currentPage: 1, totalPages: 1, pageSize: 100, startYear: 2020, endYear: new Date().getFullYear(), endMonth: new Date().getMonth() + 1, // 当前月份 // 模拟不同月份的论文数据 papersByMonth: { '2020-01': [ { id: 101, title: 'Language Models are Unsupervised Multitask Learners', authors: 'Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever', citations: 12543, arxivId: '1909.08593', publishedDate: '2020-01-15', keywords: ['GPT-2', 'language model', 'unsupervised learning', 'NLP'], }, ], '2024-01': [ { id: 1, title: 'Attention Is All You Need', authors: 'Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin', citations: 45672, arxivId: '1706.03762', publishedDate: '2024-01-15', keywords: ['transformer', 'attention', 'neural networks', 'NLP'], }, { id: 2, title: 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding', authors: 'Jacob Devlin, Ming-Wei Chang, Kenton Lee, Kristina Toutanova', citations: 38291, arxivId: '1810.04805', publishedDate: '2024-01-22', keywords: ['BERT', 'transformer', 'language model', 'pre-training'], }, ], }, }; }, computed: { availableYears() { const years = []; const currentYear = new Date().getFullYear(); for (let year = 2020; year <= currentYear; year++) { years.push(year); } return years; }, selectedMonthLabel() { if (!this.selectedMonth) return ''; const [year, month] = this.selectedMonth.split('-'); return `${year}年${parseInt(month)}月`; }, visiblePages() { const pages = []; const maxVisible = 5; // 最多显示5个页码 let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2)); let end = Math.min(this.totalPages, start + maxVisible - 1); // 调整起始位置，确保显示足够的页码 if (end - start + 1 < maxVisible) { start = Math.max(1, end - maxVisible + 1); } for (let i = start; i <= end; i++) { pages.push(i); } return pages; }, }, methods: { isValidMonth(year, month) { // 检查月份是否在有效范围内 const now = new Date(); const currentYear = now.getFullYear(); const currentMonth = now.getMonth() + 1; // 不能早于2020年1月 if (year < 2020 || (year === 2020 && month < 1)) return false; // 不能晚于当前年月 if (year > currentYear || (year === currentYear && month > currentMonth)) return false; return true; }, getAvailableMonthsForYear(year) { if (!year) return []; const now = new Date(); const currentYear = now.getFullYear(); const currentMonth = now.getMonth() + 1; const months = []; const startMonth = year === 2020 ? 1 : 1; const endMonth = year === currentYear ? currentMonth : 12; for (let month = startMonth; month <= endMonth; month++) { months.push(month); } return months; }, onYearChange() { this.selectedMonthOnly = ''; this.selectedMonth = ''; this.allMonthlyPapers = []; this.filteredPapers = []; this.displayedPapers = []; this.currentPage = 1; this.totalPages = 1; // 默认选择12月（如果12月可用的话） if (this.selectedYear) { const availableMonths = this.getAvailableMonthsForYear(this.selectedYear); if (availableMonths.includes(12)) { this.selectMonthOnly(12); } else if (availableMonths.length > 0) { // 如果12月不可用，选择该年份的最后一个可用月份 this.selectMonthOnly(availableMonths[availableMonths.length - 1]); } } }, selectMonthOnly(month) { this.selectedMonthOnly = month; if (this.selectedYear && month) { const monthValue = `${this.selectedYear}-${month.toString().padStart(2, '0')}`; this.selectMonth(monthValue); } }, selectMonth(monthValue) { this.selectedMonth = monthValue; const [year, month] = monthValue.split('-'); this.selectedYear = parseInt(year); this.selectedMonthOnly = parseInt(month); // 不清除关键词，保留用户的搜索条件 this.currentPage = 1; this.totalPages = 1; this.loadMonthlyPapers(); }, async loadMonthlyPapers() { this.isLoading = true; this.loadError = null; try { // 将 YYYY-MM 格式转换为 YYYYMM 格式 const monthParam = this.selectedMonth.replace('-', ''); // 一次性加载该月的全部数据 await this.loadAllMonthData(monthParam); // 如果有关键词，在新数据加载完成后重新应用过滤 if (this.filterKeyword.trim()) { this.filterPapers(); } else { // 没有关键词时，正常计算分页和显示数据 this.calculateTotalPages(); this.updateCurrentPageData(); } } catch (error) { console.error('获取论文数据失败:', error); this.loadError = error.message; // 如果API请求失败，使用本地模拟数据作为备用 const fallbackData = this.papersByMonth[this.selectedMonth] || []; if (fallbackData.length > 0) { this.allMonthlyPapers = fallbackData.sort((a, b) => b.citations - a.citations); // 如果有关键词，重新应用过滤 if (this.filterKeyword.trim()) { this.filterPapers(); } else { this.calculateTotalPages(); this.updateCurrentPageData(); } this.loadError = null; // 清除错误，因为有备用数据 } else { this.allMonthlyPapers = []; this.filteredPapers = []; this.displayedPapers = []; this.totalPages = 1; this.currentPage = 1; } } this.isLoading = false; }, async loadAllMonthData(monthParam) { const response = await fetch(`http://125.34.17.225:9300/meta/${monthParam}`); if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); } const result = await response.json(); if (result.ret === 'ok' && result.data) { // 转换API数据格式为组件需要的格式，后端已按引用量排序，直接使用后端返回的id this.allMonthlyPapers = result.data.map((paper) => ({ id: paper.id, title: paper.title, authors: paper.authors, citations: paper.citations, arxivId: this.extractArxivId(paper.url), publishedDate: this.formatPublishedDate(paper.publishedMonth), keywords: paper.keywords || [], url: paper.url, })); } else { throw new Error('API返回数据格式错误'); } }, calculateTotalPages() { // 基于过滤后的数据计算总页数 const dataLength = this.filterKeyword.trim() ? this.filteredPapers.length : this.allMonthlyPapers.length; this.totalPages = Math.max(1, Math.ceil(dataLength / this.pageSize)); }, updateCurrentPageData() { const startIndex = (this.currentPage - 1) * this.pageSize; const endIndex = startIndex + this.pageSize; // 根据是否有关键词过滤来选择数据源 const sourceData = this.filterKeyword.trim() ? this.filteredPapers : this.allMonthlyPapers; // 从数据源中截取当前页的数据 this.displayedPapers = sourceData.slice(startIndex, endIndex); }, filterPapers() { if (!this.filterKeyword.trim()) { // 没有关键词时，清空过滤结果 this.filteredPapers = []; this.currentPage = 1; this.calculateTotalPages(); this.updateCurrentPageData(); return; } const keyword = this.filterKeyword.toLowerCase(); // 在全部论文中进行搜索 this.filteredPapers = this.allMonthlyPapers.filter( (paper) => paper.title.toLowerCase().includes(keyword) || paper.authors.toLowerCase().includes(keyword) || paper.keywords.some((k) => k.toLowerCase().includes(keyword)), ); // 重置到第一页并重新计算分页 this.currentPage = 1; this.calculateTotalPages(); this.updateCurrentPageData(); }, filterByKeyword(keyword) { this.filterKeyword = keyword; this.filterPapers(); }, clearFilter() { this.filterKeyword = ''; this.filteredPapers = []; this.currentPage = 1; this.calculateTotalPages(); this.updateCurrentPageData(); }, changePage(page) { if (page < 1 || page > this.totalPages || page === this.currentPage) { return; } this.currentPage = page; // 前端分页，无需API请求 this.updateCurrentPageData(); }, goToFirstPage() { this.changePage(1); }, goToLastPage() { this.changePage(this.totalPages); }, goToPrevPage() { this.changePage(this.currentPage - 1); }, goToNextPage() { this.changePage(this.currentPage + 1); }, openArxivLink(arxivId) { window.open(`https://arxiv.org/abs/${arxivId}`, '_blank'); }, formatNumber(num) { return num.toLocaleString(); }, extractArxivId(url) { // 从URL中提取arXiv ID // 例如: https://arxiv.org/pdf/2506.01939 -> 2506.01939 const match = url.match(/arxiv\.org\/pdf\/([^\/]+)/); return match ? match[1] : ''; }, formatPublishedDate(publishedMonth) { // 将 YYYYMM 格式转换为 YYYY-MM-01 格式 if (publishedMonth && publishedMonth.length === 6) { const year = publishedMonth.substring(0, 4); const month = publishedMonth.substring(4, 6); return `${year}-${month}-01`; } return ''; }, openPaperLink(paper) { // 优先使用paper.url，如果没有则使用arxivId构建链接 if (paper.url) { window.open(paper.url, '_blank'); } else if (paper.arxivId) { window.open(`https://arxiv.org/abs/${paper.arxivId}`, '_blank'); } }, truncateAuthors(authors, maxLength) { if (!authors || authors.length <= maxLength) { return authors; } return authors.substring(0, maxLength) + '...'; }, formatDate(dateString) { return new Date(dateString).toLocaleDateString('zh-CN'); }, }, mounted() { // 默认选择当前月份或最新可用月份 const now = new Date(); const currentYear = now.getFullYear(); const currentMonth = now.getMonth() + 1; if (this.isValidMonth(currentYear, currentMonth)) { const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`; this.selectMonth(monthValue); } else { // 选择最新的可用月份（当前年月） const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`; this.selectMonth(monthValue); } }, };
 </script>
