@@ -57,25 +57,6 @@
                         </div>
                     </div>
 
-                    <!-- Current Selection Display -->
-                    <div
-                        v-if="selectedMonth"
-                        class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4"
-                    >
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="text-blue-800 font-medium">当前选择:</span>
-                                <span class="text-blue-700">{{ selectedMonthLabel }}</span>
-                            </div>
-                            <button
-                                @click="clearMonthSelection"
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
-                                重新选择
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Quick Selection for Recent Months -->
                     <div v-if="!selectedMonth" class="mt-4">
                         <label class="block text-xs text-gray-500 mb-2"
