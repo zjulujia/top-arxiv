@@ -416,7 +416,7 @@ export default {
             this.selectedMonthOnly = '';
             this.selectedMonth = '';
             this.allMonthlyPapers = [];
-            this.monthlyPapers = [];
+            this.filteredPapers = [];
             this.displayedPapers = [];
             this.currentPage = 1;
             this.totalPages = 1;
@@ -446,7 +446,7 @@ export default {
             const [year, month] = monthValue.split('-');
             this.selectedYear = parseInt(year);
             this.selectedMonthOnly = parseInt(month);
-            this.filterKeyword = '';
+            // 不清除关键词，保留用户的搜索条件
             this.currentPage = 1;
             this.totalPages = 1;
             this.loadMonthlyPapers();
@@ -463,11 +463,14 @@ export default {
                 // 一次性加载该月的全部数据
                 await this.loadAllMonthData(monthParam);
 
-                // 计算总页数
-                this.calculateTotalPages();
-
-                // 更新当前页显示的数据
-                this.updateCurrentPageData();
+                // 如果有关键词，在新数据加载完成后重新应用过滤
+                if (this.filterKeyword.trim()) {
+                    this.filterPapers();
+                } else {
+                    // 没有关键词时，正常计算分页和显示数据
+                    this.calculateTotalPages();
+                    this.updateCurrentPageData();
+                }
             } catch (error) {
                 console.error('获取论文数据失败:', error);
                 this.loadError = error.message;
@@ -476,12 +479,18 @@ export default {
                 const fallbackData = this.papersByMonth[this.selectedMonth] || [];
                 if (fallbackData.length > 0) {
                     this.allMonthlyPapers = fallbackData.sort((a, b) => b.citations - a.citations);
-                    this.calculateTotalPages();
-                    this.updateCurrentPageData();
+
+                    // 如果有关键词，重新应用过滤
+                    if (this.filterKeyword.trim()) {
+                        this.filterPapers();
+                    } else {
+                        this.calculateTotalPages();
+                        this.updateCurrentPageData();
+                    }
                     this.loadError = null; // 清除错误，因为有备用数据
                 } else {
                     this.allMonthlyPapers = [];
-                    this.monthlyPapers = [];
+                    this.filteredPapers = [];
                     this.displayedPapers = [];
                     this.totalPages = 1;
                     this.currentPage = 1;
