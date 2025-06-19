@@ -4,7 +4,9 @@
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Arxiv AI论文 排序</h1>
-                <p class="text-gray-600 text-sm sm:text-base">Arxiv当月全部AI学术论文，按引用量排序</p>
+                <p class="text-gray-600 text-sm sm:text-base">
+                    Arxiv当月全部AI学术论文，按引用量排序
+                </p>
             </div>
         </header>
 
@@ -115,29 +117,30 @@
                             {{ (currentPage - 1) * pageSize + index + 1 }}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div
-                                class="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-2"
-                            >
+                            <!-- Title -->
+                            <div class="mb-2">
                                 <h2
-                                    class="text-lg sm:text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors mb-2 lg:mb-0 lg:mr-4"
+                                    class="text-lg sm:text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
                                     @click="openPaperLink(paper)"
                                 >
                                     {{ paper.title }}
                                 </h2>
-                                <div
-                                    class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500"
+                            </div>
+
+                            <!-- Citations and arXiv ID -->
+                            <div
+                                class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 mb-2"
+                            >
+                                <span
+                                    class="bg-red-100 text-red-800 px-2 sm:px-3 py-1 rounded-full font-medium whitespace-nowrap"
                                 >
-                                    <span
-                                        class="bg-red-100 text-red-800 px-2 sm:px-3 py-1 rounded-full font-medium whitespace-nowrap"
-                                    >
-                                        📊 {{ formatNumber(paper.citations) }}
-                                    </span>
-                                    <span
-                                        class="bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 rounded-full font-mono text-xs whitespace-nowrap"
-                                    >
-                                        arXiv:{{ paper.arxivId }}
-                                    </span>
-                                </div>
+                                    📊 {{ formatNumber(paper.citations) }}
+                                </span>
+                                <span
+                                    class="bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 rounded-full font-mono text-xs whitespace-nowrap"
+                                >
+                                    arXiv:{{ paper.arxivId }}
+                                </span>
                             </div>
 
                             <div
