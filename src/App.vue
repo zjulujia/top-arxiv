@@ -3,9 +3,7 @@
         <!-- Header -->
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                    Arxiv AI论文排序
-                </h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Arxiv AI论文排序</h1>
                 <p class="text-gray-600 text-sm sm:text-base">
                     Arxiv当月全部AI学术论文 按引用量排序 每日更新
                 </p>
@@ -27,11 +25,7 @@
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                             >
                                 <option value="">选择年份</option>
-                                <option
-                                    v-for="year in availableYears"
-                                    :key="year"
-                                    :value="year"
-                                >
+                                <option v-for="year in availableYears" :key="year" :value="year">
                                     {{ year }}年
                                 </option>
                             </select>
@@ -220,10 +214,7 @@
                 </nav>
             </div>
             <!-- Page Info -->
-            <div
-                v-if="totalPages > 1 && !isLoading"
-                class="mt-4 text-center text-sm text-gray-500"
-            >
+            <div v-if="totalPages > 1 && !isLoading" class="mt-4 text-center text-sm text-gray-500">
                 第 {{ currentPage }} 页，共 {{ totalPages }} 页
             </div>
             <!-- Error Message -->
@@ -234,9 +225,7 @@
                 <div class="flex items-center">
                     <div class="text-red-800"><strong>加载失败:</strong> {{ loadError }}</div>
                 </div>
-                <p class="text-red-600 text-sm mt-2">
-                    已尝试使用备用数据，如果问题持续请稍后重试
-                </p>
+                <p class="text-red-600 text-sm mt-2">已尝试使用备用数据，如果问题持续请稍后重试</p>
             </div>
             <!-- No results -->
             <div
@@ -291,7 +280,8 @@ export default {
                     {
                         id: 101,
                         title: 'Language Models are Unsupervised Multitask Learners',
-                        authors: 'Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever',
+                        authors:
+                            'Alec Radford, Jeffrey Wu, Rewon Child, David Luan, Dario Amodei, Ilya Sutskever',
                         citations: 12543,
                         arxivId: '1909.08593',
                         publishedDate: '2020-01-15',
@@ -302,7 +292,8 @@ export default {
                     {
                         id: 1,
                         title: 'Attention Is All You Need',
-                        authors: 'Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin',
+                        authors:
+                            'Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser, Illia Polosukhin',
                         citations: 45672,
                         arxivId: '1706.03762',
                         publishedDate: '2024-01-15',
@@ -461,13 +452,17 @@ export default {
             }
         },
         calculateTotalPages() {
-            const dataLength = this.filterKeyword.trim() ? this.filteredPapers.length : this.allMonthlyPapers.length;
+            const dataLength = this.filterKeyword.trim()
+                ? this.filteredPapers.length
+                : this.allMonthlyPapers.length;
             this.totalPages = Math.max(1, Math.ceil(dataLength / this.pageSize));
         },
         updateCurrentPageData() {
             const startIndex = (this.currentPage - 1) * this.pageSize;
             const endIndex = startIndex + this.pageSize;
-            const sourceData = this.filterKeyword.trim() ? this.filteredPapers : this.allMonthlyPapers;
+            const sourceData = this.filterKeyword.trim()
+                ? this.filteredPapers
+                : this.allMonthlyPapers;
             this.displayedPapers = sourceData.slice(startIndex, endIndex);
         },
         filterPapers() {
