@@ -15,39 +15,66 @@
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
                 <!-- Month Selection -->
                 <div class="mb-6">
-                    <!-- Year and Month Selectors -->
-                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                        <div class="flex-1">
-                            <label class="block text-xs text-gray-500 mb-1">年份</label>
-                            <select
-                                v-model="selectedYear"
-                                @change="onYearChange"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
-                            >
-                                <option value="">选择年份</option>
-                                <option v-for="year in availableYears" :key="year" :value="year">
-                                    {{ year }}年
-                                </option>
-                            </select>
-                        </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-4">选择月份</label>
 
-                        <div class="flex-1">
-                            <label class="block text-xs text-gray-500 mb-1">月份</label>
-                            <select
-                                v-model="selectedMonthOnly"
-                                @change="onMonthChange"
-                                :disabled="!selectedYear"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    <!-- Year Buttons -->
+                    <div class="mb-4">
+                        <label class="block text-xs text-gray-500 mb-2">年份</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                v-for="year in availableYears"
+                                :key="year"
+                                @click="selectYear(year)"
+                                :class="[
+                                    'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                                    selectedYear === year
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                                ]"
                             >
-                                <option value="">选择月份</option>
-                                <option
-                                    v-for="month in getAvailableMonthsForYear(selectedYear)"
-                                    :key="month"
-                                    :value="month"
-                                >
-                                    {{ month }}月
-                                </option>
-                            </select>
+                                {{ year }}年
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Month Buttons -->
+                    <div v-if="selectedYear" class="mb-4">
+                        <label class="block text-xs text-gray-500 mb-2">月份</label>
+                        <div
+                            class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2"
+                        >
+                            <button
+                                v-for="month in getAvailableMonthsForYear(selectedYear)"
+                                :key="month"
+                                @click="selectMonthOnly(month)"
+                                :class="[
+                                    'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                                    selectedMonthOnly === month
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                                ]"
+                            >
+                                {{ month }}月
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Current Selection Display -->
+                    <div
+                        v-if="selectedMonth"
+                        class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4"
+                    >
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="text-blue-800 font-medium">当前选择:</span>
+                                <span class="text-blue-700">{{ selectedMonthLabel }}</span>
+                            </div>
+                            <button
+                                @click="clearMonthSelection"
+                                class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            >
+                                重新选择
+                            </button>
                         </div>
                     </div>
 
@@ -511,7 +538,8 @@ export default {
             return months;
         },
 
-        onYearChange() {
+        selectYear(year) {
+            this.selectedYear = year;
             this.selectedMonthOnly = '';
             this.selectedMonth = '';
             this.monthlyPapers = [];
@@ -520,9 +548,10 @@ export default {
             this.totalPages = 1;
         },
 
-        onMonthChange() {
-            if (this.selectedYear && this.selectedMonthOnly) {
-                const monthValue = `${this.selectedYear}-${this.selectedMonthOnly.toString().padStart(2, '0')}`;
+        selectMonthOnly(month) {
+            this.selectedMonthOnly = month;
+            if (this.selectedYear && month) {
+                const monthValue = `${this.selectedYear}-${month.toString().padStart(2, '0')}`;
                 this.selectMonth(monthValue);
             }
         },
@@ -545,6 +574,8 @@ export default {
             this.monthlyPapers = [];
             this.displayedPapers = [];
             this.filterKeyword = '';
+            this.currentPage = 1;
+            this.totalPages = 1;
         },
 
         async loadMonthlyPapers() {
