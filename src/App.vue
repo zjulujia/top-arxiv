@@ -3,7 +3,7 @@
         <!-- Header -->
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Arxiv AI论文 排序</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Arxiv AI论文排序</h1>
                 <p class="text-gray-600 text-sm sm:text-base">
                     Arxiv当月全部AI学术论文，按引用量排序
                 </p>
