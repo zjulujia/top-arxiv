@@ -485,6 +485,17 @@ export default {
             this.displayedPapers = [];
             this.currentPage = 1;
             this.totalPages = 1;
+
+            // 默认选择12月（如果12月可用的话）
+            if (this.selectedYear) {
+                const availableMonths = this.getAvailableMonthsForYear(this.selectedYear);
+                if (availableMonths.includes(12)) {
+                    this.selectMonthOnly(12);
+                } else if (availableMonths.length > 0) {
+                    // 如果12月不可用，选择该年份的最后一个可用月份
+                    this.selectMonthOnly(availableMonths[availableMonths.length - 1]);
+                }
+            }
         },
 
         selectMonthOnly(month) {
