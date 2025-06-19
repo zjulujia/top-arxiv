@@ -7,7 +7,7 @@
                     Arxiv AI论文排序
                 </h1>
                 <p class="text-gray-600 text-sm sm:text-base">
-                    Arxiv当月全部AI学术论文，按引用量排序
+                    Arxiv当月全部AI学术论文 按引用量排序 每日更新
                 </p>
             </div>
         </header>
