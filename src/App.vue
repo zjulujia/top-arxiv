@@ -117,30 +117,27 @@
                             {{ (currentPage - 1) * pageSize + index + 1 }}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <!-- Title -->
-                            <div class="mb-2">
+                            <div class="flex items-start gap-4 mb-2">
                                 <h2
-                                    class="text-lg sm:text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors"
+                                    class="flex-1 text-lg sm:text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors min-w-0"
                                     @click="openPaperLink(paper)"
                                 >
                                     {{ paper.title }}
                                 </h2>
-                            </div>
-
-                            <!-- Citations and arXiv ID -->
-                            <div
-                                class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 mb-2"
-                            >
-                                <span
-                                    class="bg-red-100 text-red-800 px-2 sm:px-3 py-1 rounded-full font-medium whitespace-nowrap"
+                                <div
+                                    class="flex-shrink-0 flex flex-col sm:flex-row items-end sm:items-center gap-2 text-xs sm:text-sm text-gray-500 w-48 sm:w-auto"
                                 >
-                                    📊 {{ formatNumber(paper.citations) }}
-                                </span>
-                                <span
-                                    class="bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 rounded-full font-mono text-xs whitespace-nowrap"
-                                >
-                                    arXiv:{{ paper.arxivId }}
-                                </span>
+                                    <span
+                                        class="bg-red-100 text-red-800 px-2 sm:px-3 py-1 rounded-full font-medium whitespace-nowrap"
+                                    >
+                                        📊 {{ formatNumber(paper.citations) }}
+                                    </span>
+                                    <span
+                                        class="bg-gray-100 text-gray-700 px-2 sm:px-3 py-1 rounded-full font-mono text-xs whitespace-nowrap"
+                                    >
+                                        arXiv:{{ paper.arxivId }}
+                                    </span>
+                                </div>
                             </div>
 
                             <div
