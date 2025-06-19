@@ -17,45 +17,43 @@
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-4">选择月份</label>
 
-                    <!-- Year Buttons -->
-                    <div class="mb-4">
-                        <label class="block text-xs text-gray-500 mb-2">年份</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button
-                                v-for="year in availableYears"
-                                :key="year"
-                                @click="selectYear(year)"
-                                :class="[
-                                    'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                                    selectedYear === year
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-                                ]"
+                    <!-- Year and Month Selection in Same Row -->
+                    <div class="flex flex-col lg:flex-row gap-4 mb-4">
+                        <!-- Year Dropdown -->
+                        <div class="lg:w-48">
+                            <label class="block text-xs text-gray-500 mb-2">年份</label>
+                            <select
+                                v-model="selectedYear"
+                                @change="onYearChange"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                             >
-                                {{ year }}年
-                            </button>
+                                <option value="">选择年份</option>
+                                <option v-for="year in availableYears" :key="year" :value="year">
+                                    {{ year }}年
+                                </option>
+                            </select>
                         </div>
-                    </div>
 
-                    <!-- Month Buttons -->
-                    <div v-if="selectedYear" class="mb-4">
-                        <label class="block text-xs text-gray-500 mb-2">月份</label>
-                        <div
-                            class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2"
-                        >
-                            <button
-                                v-for="month in getAvailableMonthsForYear(selectedYear)"
-                                :key="month"
-                                @click="selectMonthOnly(month)"
-                                :class="[
-                                    'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                                    selectedMonthOnly === month
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-                                ]"
+                        <!-- Month Buttons -->
+                        <div v-if="selectedYear" class="flex-1">
+                            <label class="block text-xs text-gray-500 mb-2">月份</label>
+                            <div
+                                class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2"
                             >
-                                {{ month }}月
-                            </button>
+                                <button
+                                    v-for="month in getAvailableMonthsForYear(selectedYear)"
+                                    :key="month"
+                                    @click="selectMonthOnly(month)"
+                                    :class="[
+                                        'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                                        selectedMonthOnly === month
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                                    ]"
+                                >
+                                    {{ month }}月
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -538,8 +536,7 @@ export default {
             return months;
         },
 
-        selectYear(year) {
-            this.selectedYear = year;
+        onYearChange() {
             this.selectedMonthOnly = '';
             this.selectedMonth = '';
             this.monthlyPapers = [];
