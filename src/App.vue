@@ -15,7 +15,6 @@
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
                 <!-- Month Selection -->
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-4">选择月份</label>
 
                     <!-- Year and Month Selection in Same Row -->
                     <div class="flex flex-col lg:flex-row gap-4 mb-4">
