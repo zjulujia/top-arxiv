@@ -15,7 +15,6 @@
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
                 <!-- Month Selection -->
                 <div class="mb-6">
-
                     <!-- Year and Month Selection in Same Row -->
                     <div class="flex flex-col lg:flex-row gap-4 mb-4">
                         <!-- Year Dropdown -->
@@ -53,23 +52,6 @@
                                     {{ month }}月
                                 </button>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Selection for Recent Months -->
-                    <div v-if="!selectedMonth" class="mt-4">
-                        <label class="block text-xs text-gray-500 mb-2"
-                            >快速选择（最近6个月）</label
-                        >
-                        <div class="flex flex-wrap gap-2">
-                            <button
-                                v-for="month in recentMonths"
-                                :key="month.value"
-                                @click="selectMonth(month.value)"
-                                class="px-3 py-1 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-md text-sm transition-colors"
-                            >
-                                {{ month.label }}
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -441,26 +423,6 @@ export default {
             if (!this.selectedMonth) return '';
             const [year, month] = this.selectedMonth.split('-');
             return `${year}年${parseInt(month)}月`;
-        },
-
-        recentMonths() {
-            const months = [];
-            const now = new Date();
-
-            for (let i = 0; i < 6; i++) {
-                const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-
-                // 检查是否在有效范围内
-                if (this.isValidMonth(year, month)) {
-                    const value = `${year}-${month.toString().padStart(2, '0')}`;
-                    const label = `${year}年${month}月`;
-                    months.push({ value, label });
-                }
-            }
-
-            return months;
         },
 
         visiblePages() {
