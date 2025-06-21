@@ -76,7 +76,7 @@
                 </div>
             </div>
             <!-- Results -->
-            <div v-if="displayedPapers.length > 0" class="mb-4">
+            <div v-if="displayedPapers.length > 0 && !isLoading" class="mb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                     <p class="text-gray-600 mb-2 sm:mb-0">
                         {{ selectedMonthLabel }} Page {{ currentPage }} of {{ totalPages }}
@@ -87,7 +87,42 @@
                     <div class="text-sm text-gray-500">Sorted by Citations</div>
                 </div>
             </div>
-            <div class="space-y-6">
+            <!-- Loading Block for Paper List -->
+            <div v-if="isLoading && selectedMonth" class="relative">
+                <div
+                    class="absolute inset-0 bg-white bg-opacity-75 backdrop-blur-sm z-10 rounded-lg"
+                >
+                    <div class="flex flex-col items-center justify-center h-96">
+                        <div
+                            class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"
+                        ></div>
+                        <p class="text-lg font-medium text-gray-700 mb-2">Loading Papers...</p>
+                        <p class="text-sm text-gray-500">
+                            Fetching data for {{ selectedMonthLabel }}
+                        </p>
+                    </div>
+                </div>
+                <!-- Placeholder content to maintain layout -->
+                <div class="space-y-6 opacity-30">
+                    <div v-for="i in 5" :key="i" class="bg-gray-100 rounded-lg p-6 animate-pulse">
+                        <div class="flex items-start gap-4 mb-4">
+                            <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
+                            <div class="flex-1">
+                                <div class="h-6 bg-gray-200 rounded mb-2"></div>
+                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-4 border-t border-gray-200">
+                            <div class="h-6 bg-gray-200 rounded w-16"></div>
+                            <div class="h-6 bg-gray-200 rounded w-20"></div>
+                            <div class="h-6 bg-gray-200 rounded w-24"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Paper List -->
+            <div v-if="!isLoading" class="space-y-6">
                 <div
                     v-for="(paper, index) in displayedPapers"
                     :key="paper.id"
@@ -252,16 +287,9 @@
                 </p>
             </div>
             <!-- No month selected -->
-            <div v-if="!selectedMonth" class="text-center py-12">
+            <div v-if="!selectedMonth && !isLoading" class="text-center py-12">
                 <div class="text-gray-400 text-lg mb-2">Please select a month</div>
                 <p class="text-gray-500">Select a month to view recommended papers</p>
-            </div>
-            <!-- Loading -->
-            <div v-if="isLoading" class="text-center py-12">
-                <div
-                    class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
-                ></div>
-                <p class="mt-4 text-gray-600">Loading papers...</p>
             </div>
         </div>
     </div>
