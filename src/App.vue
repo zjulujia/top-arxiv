@@ -507,10 +507,10 @@ export default {
             this.totalPages = 1;
             if (this.selectedYear) {
                 const availableMonths = this.getAvailableMonthsForYear(this.selectedYear);
-                if (availableMonths.includes(12)) {
-                    this.selectMonthOnly(12);
+                if (availableMonths.includes(1)) {
+                    this.selectMonthOnly(1);
                 } else if (availableMonths.length > 0) {
-                    this.selectMonthOnly(availableMonths[availableMonths.length - 1]);
+                    this.selectMonthOnly(availableMonths[0]);
                 }
             }
         },
