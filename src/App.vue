@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gray-50 w-full">
+    <div class="min-h-screen bg-gray-50 w-full overflow-y-scroll">
         <!-- Header -->
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -86,13 +86,12 @@
                     </p>
                     <div class="text-sm text-gray-500">Sorted by Citations</div>
                 </div>
-            </div>
-            <!-- Loading Block for Paper List -->
-            <div v-if="isLoading && selectedMonth" class="relative">
+            </div<!-- Loading Block for Paper List -->
+            <div v-if="isLoading && selectedMonth" class="relative min-h-screen">
                 <div
                     class="absolute inset-0 bg-white bg-opacity-75 backdrop-blur-sm z-10 rounded-lg"
                 >
-                    <div class="flex flex-col items-center justify-center h-96">
+                    <div class="flex flex-col items-center justify-center" style="height: 50vh;">
                         <div
                             class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"
                         ></div>
@@ -102,21 +101,23 @@
                         </p>
                     </div>
                 </div>
-                <!-- Placeholder content to maintain layout -->
+                <!-- Placeholder content to maintain layout and prevent scrollbar jumping -->
                 <div class="space-y-6 opacity-30">
-                    <div v-for="i in 5" :key="i" class="bg-gray-100 rounded-lg p-6 animate-pulse">
+                    <div v-for="i in Math.max(15, pageSize / 5)" :key="i" class="bg-gray-100 rounded-lg p-6 animate-pulse">
                         <div class="flex items-start gap-4 mb-4">
                             <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
                             <div class="flex-1">
                                 <div class="h-6 bg-gray-200 rounded mb-2"></div>
                                 <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                                <div class="h-4 bg-gray-200 rounded w-1/2 mb-3"></div>
+                                <div class="h-4 bg-gray-200 rounded w-2/3"></div>
                             </div>
                         </div>
                         <div class="flex gap-2 pt-4 border-t border-gray-200">
                             <div class="h-6 bg-gray-200 rounded w-16"></div>
                             <div class="h-6 bg-gray-200 rounded w-20"></div>
                             <div class="h-6 bg-gray-200 rounded w-24"></div>
+                            <div class="h-6 bg-gray-200 rounded w-20"></div>
                         </div>
                     </div>
                 </div>
