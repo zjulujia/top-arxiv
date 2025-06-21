@@ -330,6 +330,9 @@
 </template>
 
 <script>
+
+const data_url = import.meta.env.VITE_API_BASE_URL;
+
 export default {
     name: 'App',
     data() {
@@ -536,7 +539,7 @@ export default {
             this.isLoading = false;
         },
         async loadAllMonthData(monthParam) {
-            const response = await fetch(`http://125.34.17.225:9300/meta/${monthParam}`);
+            const response = await fetch(`${data_url}/meta/${monthParam}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
