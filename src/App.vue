@@ -653,13 +653,17 @@ export default {
     mounted() {
         const now = new Date();
         const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;
-        if (this.isValidMonth(currentYear, currentMonth)) {
-            const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
+        const firstMonth = 1; // 默认选择第一个月（1月）
+        if (this.isValidMonth(currentYear, firstMonth)) {
+            const monthValue = `${currentYear}-${firstMonth.toString().padStart(2, '0')}`;
             this.selectMonth(monthValue);
         } else {
-            const monthValue = `${currentYear}-${currentMonth.toString().padStart(2, '0')}`;
-            this.selectMonth(monthValue);
+            // 如果当年1月不可用，则选择当年第一个可用的月份
+            const availableMonths = this.getAvailableMonthsForYear(currentYear);
+            if (availableMonths.length > 0) {
+                const monthValue = `${currentYear}-${availableMonths[0].toString().padStart(2, '0')}`;
+                this.selectMonth(monthValue);
+            }
         }
     },
 };
