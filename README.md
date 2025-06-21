@@ -1,39 +1,44 @@
 # ArXiv AI Paper Ranking
 
-一个基于引用数量排序的ArXiv AI论文排名系统，帮助研究者快速发现和浏览最具影响力的AI学术论文。
+A citation-based ranking system for ArXiv AI papers, helping researchers quickly discover and browse the most influential AI academic papers.
 
-## 🚀 核心功能
+## 🚀 Core Features
 
-### 📊 论文排名与展示
+### Website
 
-- **按引用数排序**：所有AI论文按照引用数量从高到低排列
-- **实时数据更新**：每日更新论文数据，确保排名的时效性
-- **详细论文信息**：显示论文标题、作者、发表日期、ArXiv ID和引用数量
-- **一键访问**：直接链接到ArXiv原文页面
+- http://top-arxiv.xyz
 
-### 🗓️ 时间筛选
+### 📊 Paper Ranking & Display
+- **Citation-based Sorting**: All AI papers ranked by citation count from highest to lowest
+- **Real-time Data Updates**: Daily paper data updates ensuring ranking timeliness
+- **Detailed Paper Information**: Display paper title, authors, publication date, ArXiv ID, and citation count
+- **One-click Access**: Direct links to ArXiv original paper pages
 
-- **年份选择**：支持2020年至当前年份的数据浏览
-- **月份筛选**：精确到月份的论文筛选功能
-- **智能默认**：自动选择最新可用月份的数据
+### 🗓️ Time Filtering
+- **Year Selection**: Browse data from 2020 to current year
+- **Month Filtering**: Precise month-level paper filtering functionality
+- **Smart Defaults**: Automatically select the latest available month's data
 
-### 🔍 智能搜索与过滤
+### 🔍 Intelligent Search & Filtering ⚡ **Newly Upgraded**
+- **Server-side Search**: Keyword search now processed on backend for dramatically improved performance
+- **Real-time Search**: Support for input debouncing and Enter key search, avoiding frequent requests
+- **Smart Defaults**: Uses default keywords when no search terms are entered
+- **AI-powered Keywords**: All paper keywords extracted by large language models
+- **Tag Clicking**: Click paper keyword tags to quickly filter related papers
 
-- **关键词搜索**：支持按论文标题、作者姓名和关键词进行搜索
-- **大模型加持**：所有论文关键词由大模型提取
-- **实时过滤**：输入即时显示匹配结果
-- **标签点击**：点击论文关键词标签快速筛选相关论文
+### 📱 User Experience Optimization ⚡ **Major Performance Boost**
+- **Responsive Design**: Perfect adaptation for desktop, tablet, and mobile devices
+- **Server-side Pagination**: On-demand loading mode, requesting only current page data
+- **Lightning Fast Loading**: Eliminates full-month data loading, significantly improving page response speed
+- **Smart Caching**: Optimized data request strategy, reducing unnecessary network requests
+- **Loading States**: Elegant loading animations and real-time page status display
+- **Error Handling**: Friendly error messages and graceful degradation
 
-### 📱 用户体验优化
+### 🏷️ AI Paper Categories
+- **cs.AI** - Artificial Intelligence
+- **cs.CV** - Computer Vision  
+- **cs.LG** - Machine Learning
+- **cs.CL** - Computational Linguistics
 
-- **响应式设计**：完美适配桌面端、平板和移动设备
-- **分页浏览**：高效的分页系统，每页显示100篇论文
-- **加载状态**：优雅的加载动画和占位符
-- **错误处理**：友好的错误提示和降级处理
-
-### 🏷️ AI论文分类
-
-- **cs.AI** - 人工智能
-- **cs.CV** - 计算机视觉
-- **cs.LG** - 机器学习
-- **cs.CL** - 计算语言学
+### 📄 License
+This project is licensed under the MIT License.
