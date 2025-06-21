@@ -20,21 +20,21 @@
                     <div class="flex flex-col lg:flex-row gap-4 mb-4">
                         <!-- Year Dropdown -->
                         <div class="lg:w-48">
-                            <label class="block text-xs text-gray-500 mb-2">年份</label>
+                            <label class="block text-xs text-gray-500 mb-2">Year</label>
                             <select
                                 v-model="selectedYear"
                                 @change="onYearChange"
                                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
                             >
-                                <option value="">选择年份</option>
+                                <option value="">Select Year</option>
                                 <option v-for="year in availableYears" :key="year" :value="year">
-                                    {{ year }}年
+                                    {{ year }}
                                 </option>
                             </select>
                         </div>
                         <!-- Month Buttons -->
                         <div v-if="selectedYear" class="flex-1">
-                            <label class="block text-xs text-gray-500 mb-2">月份</label>
+                            <label class="block text-xs text-gray-500 mb-2">Month</label>
                             <div
                                 class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-2"
                             >
@@ -49,7 +49,7 @@
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
                                     ]"
                                 >
-                                    {{ month }}月
+                                    {{ getMonthName(month) }}
                                 </button>
                             </div>
                         </div>
@@ -57,12 +57,11 @@
                 </div>
                 <!-- Keyword Filter -->
                 <div>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <input
+                    <div class="flex flex-col sm:flex-row gap-4"<input
                             type="text"
                             v-model="filterKeyword"
                             @input="filterPapers"
-                            placeholder="输入关键词过滤当月论文..."
+                            placeholder="Enter keywords to filter papers..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
                         <button
@@ -70,21 +69,20 @@
                             v-if="filterKeyword"
                             class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm sm:text-base whitespace-nowrap"
                         >
-                            清除过滤
+                            Clear Filter
                         </button>
                     </div>
                 </div>
             </div>
             <!-- Results -->
-            <div v-if="displayedPapers.length > 0" class="mb-4">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div v-if="displayedPapers.length > 0" class="mb-4"<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                     <p class="text-gray-600 mb-2 sm:mb-0">
-                        {{ selectedMonthLabel }} 第 {{ currentPage }} 页，共 {{ totalPages }} 页
+                        {{ selectedMonthLabel }} Page {{ currentPage }} of {{ totalPages }}
                         <span v-if="filterKeyword" class="text-blue-600">
-                            （过滤后共 {{ filteredPapers.length }} 篇）
+                            ({{ filteredPapers.length }} papers after filtering)
                         </span>
                     </p>
-                    <div class="text-sm text-gray-500">按引用量排序</div>
+                    <div class="text-sm text-gray-500">Sorted by Citations</div>
                 </div>
             </div>
             <div class="space-y-6">
@@ -122,11 +120,10 @@
                                         arXiv:{{ paper.arxivId }}
                                     </span>
                                 </div>
-                            </div>
-                            <div
+                            </div<div
                                 class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-gray-600 mb-3"
                             >
-                                <span class="font-medium">作者:</span>
+                                <span class="font-medium">Authors:</span>
                                 <p class="text-gray-700 break-words">
                                     {{ truncateAuthors(paper.authors, 100) }}
                                 </p>
@@ -136,9 +133,8 @@
                     <!-- Footer with keywords and date -->
                     <div
                         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-4 border-t border-gray-100"
-                    >
-                        <div class="flex flex-wrap gap-2">
-                            <span class="text-sm font-medium text-gray-700 mr-2">关键词:</span>
+                    <div class="flex flex-wrap gap-2">
+                            <span class="text-sm font-medium text-gray-700 mr-2">Keywords:</span>
                             <span
                                 v-for="(keyword, keywordIndex) in paper.keywords"
                                 :key="keywordIndex"
@@ -151,12 +147,11 @@
                         <div
                             class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-500"
                         >
-                            <span>📅 {{ formatDate(paper.publishedDate) }}</span>
-                            <button
+                            <span>📅 {{ formatDate(paper.publishedDate) }}</span<button
                                 class="text-blue-600 hover:text-blue-800 font-medium text-left sm:text-center"
                                 @click="openPaperLink(paper)"
                             >
-                                查看原文 →
+                                View Paper →
                             </button>
                         </div>
                     </div>
@@ -165,13 +160,12 @@
             <!-- Pagination -->
             <div v-if="totalPages > 1 && !isLoading" class="mt-8 flex justify-center">
                 <nav class="flex items-center space-x-2">
-                    <!-- First Page -->
-                    <button
+                    <!-- First Page --<button
                         @click="goToFirstPage"
                         :disabled="currentPage === 1"
                         class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        首页
+                        First
                     </button>
                     <!-- Previous Page -->
                     <button
@@ -179,7 +173,7 @@
                         :disabled="currentPage === 1"
                         class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        上一页
+                        Previous
                     </button>
                     <!-- Page Numbers -->
                     <div class="flex items-center space-x-1">
@@ -197,13 +191,12 @@
                             {{ page }}
                         </button>
                     </div>
-                    <!-- Next Page -->
-                    <button
+                    <!-- Next Page --<button
                         @click="goToNextPage"
                         :disabled="currentPage === totalPages"
                         class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        下一页
+                        Next
                     </button>
                     <!-- Last Page -->
                     <button
@@ -211,47 +204,42 @@
                         :disabled="currentPage === totalPages"
                         class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        末页
+                        Last
                     </button>
                 </nav>
             </div>
-            <!-- Page Info -->
-            <div v-if="totalPages > 1 && !isLoading" class="mt-4 text-center text-sm text-gray-500">
-                第 {{ currentPage }} 页，共 {{ totalPages }} 页
+            <!-- Page Info --<div v-if="totalPages > 1 && !isLoading" class="mt-4 text-center text-sm text-gray-500">
+                Page {{ currentPage }} of {{ totalPages }}
             </div>
-            <!-- Error Message -->
-            <div
+            <!-- Error Message --<div
                 v-if="loadError && !isLoading"
                 class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
             >
                 <div class="flex items-center">
-                    <div class="text-red-800"><strong>加载失败:</strong> {{ loadError }}</div>
+                    <div class="text-red-800"><strong>Loading Failed:</strong> {{ loadError }}</div>
                 </div>
-                <p class="text-red-600 text-sm mt-2">已尝试使用备用数据，如果问题持续请稍后重试</p>
+                <p class="text-red-600 text-sm mt-2">Fallback data has been used. Please try again later if the problem persists.</p>
             </div>
-            <!-- No results -->
-            <div
+            <!-- No results --<div
                 v-if="selectedMonth && displayedPapers.length === 0 && !isLoading && !loadError"
                 class="text-center py-12"
             >
                 <div class="text-gray-400 text-lg mb-2">
-                    {{ filterKeyword ? '未找到匹配的论文' : '该月份暂无论文' }}
+                    {{ filterKeyword ? 'No matching papers found' : 'No papers available for this month' }}
                 </div>
                 <p class="text-gray-500">
-                    {{ filterKeyword ? '请尝试其他关键词或选择其他月份' : '请选择其他月份' }}
+                    {{ filterKeyword ? 'Try different keywords or select another month' : 'Please select another month' }}
                 </p>
             </div>
-            <!-- No month selected -->
-            <div v-if="!selectedMonth" class="text-center py-12">
-                <div class="text-gray-400 text-lg mb-2">请选择月份</div>
-                <p class="text-gray-500">选择一个月份来查看该月的推荐论文</p>
+            <!-- No month selected --<div v-if="!selectedMonth" class="text-center py-12">
+                <div class="text-gray-400 text-lg mb-2">Please select a month</div>
+                <p class="text-gray-500">Select a month to view recommended papers</p>
             </div>
-            <!-- Loading -->
-            <div v-if="isLoading" class="text-center py-12">
+            <!-- Loading --<div v-if="isLoading" class="text-center py-12">
                 <div
                     class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
                 ></div>
-                <p class="mt-4 text-gray-600">正在加载论文...</p>
+                <p class="mt-4 text-gray-600">Loading papers...</p>
             </div>
         </div>
     </div>
