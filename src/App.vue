@@ -17,17 +17,19 @@
                                 </span>
                                 <!-- Tooltip -->
                                 <div
-                                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50"
+                                    class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50"
                                 >
                                     <div class="text-center">
-                                        <div class="font-medium mb-1">AI Paper Categories:</div>
                                         <div class="text-xs space-y-0.5">
-                                            cs.AI, cs.CV, cs.LG, cs.CL
+                                            <div>cs.AI - Artificial Intelligence</div>
+                                            <div>cs.CV - Computer Vision</div>
+                                            <div>cs.LG - Machine Learning</div>
+                                            <div>cs.CL - Computational Linguistics</div>
                                         </div>
                                     </div>
                                     <!-- Tooltip arrow -->
                                     <div
-                                        class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"
+                                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-800"
                                     ></div>
                                 </div>
                             </div>
