@@ -3,10 +3,10 @@
         <!-- Header -->
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
-                    Arxiv AI论文排序
-                    <span class="text-gray-600 text-sm sm:text-base block mt-2">
-                        Arxiv当月全部AI学术论文 按引用量排序 每日更新
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                    ArXiv AI Paper Rankings
+                    <span class="text-gray-600 text-sm sm:text-base ml-4">
+                        All ArXiv AI Papers This Month Sorted by Citations Daily Updated
                     </span>
                 </h1>
             </div>
@@ -57,7 +57,8 @@
                 </div>
                 <!-- Keyword Filter -->
                 <div>
-                    <div class="flex flex-col sm:flex-row gap-4"<input
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <input
                             type="text"
                             v-model="filterKeyword"
                             @input="filterPapers"
@@ -75,7 +76,8 @@
                 </div>
             </div>
             <!-- Results -->
-            <div v-if="displayedPapers.length > 0" class="mb-4"<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div v-if="displayedPapers.length > 0" class="mb-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                     <p class="text-gray-600 mb-2 sm:mb-0">
                         {{ selectedMonthLabel }} Page {{ currentPage }} of {{ totalPages }}
                         <span v-if="filterKeyword" class="text-blue-600">
@@ -120,7 +122,8 @@
                                         arXiv:{{ paper.arxivId }}
                                     </span>
                                 </div>
-                            </div<div
+                            </div>
+                            <div
                                 class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-gray-600 mb-3"
                             >
                                 <span class="font-medium">Authors:</span>
@@ -133,7 +136,8 @@
                     <!-- Footer with keywords and date -->
                     <div
                         class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pt-4 border-t border-gray-100"
-                    <div class="flex flex-wrap gap-2">
+                    >
+                        <div class="flex flex-wrap gap-2">
                             <span class="text-sm font-medium text-gray-700 mr-2">Keywords:</span>
                             <span
                                 v-for="(keyword, keywordIndex) in paper.keywords"
@@ -147,7 +151,8 @@
                         <div
                             class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-500"
                         >
-                            <span>📅 {{ formatDate(paper.publishedDate) }}</span<button
+                            <span>📅 {{ formatDate(paper.publishedDate) }}</span>
+                            <button
                                 class="text-blue-600 hover:text-blue-800 font-medium text-left sm:text-center"
                                 @click="openPaperLink(paper)"
                             >
@@ -160,7 +165,8 @@
             <!-- Pagination -->
             <div v-if="totalPages > 1 && !isLoading" class="mt-8 flex justify-center">
                 <nav class="flex items-center space-x-2">
-                    <!-- First Page --<button
+                    <!-- First Page -->
+                    <button
                         @click="goToFirstPage"
                         :disabled="currentPage === 1"
                         class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -191,7 +197,8 @@
                             {{ page }}
                         </button>
                     </div>
-                    <!-- Next Page --<button
+                    <!-- Next Page -->
+                    <button
                         @click="goToNextPage"
                         :disabled="currentPage === totalPages"
                         class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -208,34 +215,49 @@
                     </button>
                 </nav>
             </div>
-            <!-- Page Info --<div v-if="totalPages > 1 && !isLoading" class="mt-4 text-center text-sm text-gray-500">
+            <!-- Page Info -->
+            <div v-if="totalPages > 1 && !isLoading" class="mt-4 text-center text-sm text-gray-500">
                 Page {{ currentPage }} of {{ totalPages }}
             </div>
-            <!-- Error Message --<div
+            <!-- Error Message -->
+            <div
                 v-if="loadError && !isLoading"
                 class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
             >
                 <div class="flex items-center">
                     <div class="text-red-800"><strong>Loading Failed:</strong> {{ loadError }}</div>
                 </div>
-                <p class="text-red-600 text-sm mt-2">Fallback data has been used. Please try again later if the problem persists.</p>
+                <p class="text-red-600 text-sm mt-2">
+                    Fallback data has been used. Please try again later if the problem persists.
+                </p>
             </div>
-            <!-- No results --<div
+            <!-- No results -->
+            <div
                 v-if="selectedMonth && displayedPapers.length === 0 && !isLoading && !loadError"
                 class="text-center py-12"
             >
                 <div class="text-gray-400 text-lg mb-2">
-                    {{ filterKeyword ? 'No matching papers found' : 'No papers available for this month' }}
+                    {{
+                        filterKeyword
+                            ? 'No matching papers found'
+                            : 'No papers available for this month'
+                    }}
                 </div>
                 <p class="text-gray-500">
-                    {{ filterKeyword ? 'Try different keywords or select another month' : 'Please select another month' }}
+                    {{
+                        filterKeyword
+                            ? 'Try different keywords or select another month'
+                            : 'Please select another month'
+                    }}
                 </p>
             </div>
-            <!-- No month selected --<div v-if="!selectedMonth" class="text-center py-12">
+            <!-- No month selected -->
+            <div v-if="!selectedMonth" class="text-center py-12">
                 <div class="text-gray-400 text-lg mb-2">Please select a month</div>
                 <p class="text-gray-500">Select a month to view recommended papers</p>
             </div>
-            <!-- Loading --<div v-if="isLoading" class="text-center py-12">
+            <!-- Loading -->
+            <div v-if="isLoading" class="text-center py-12">
                 <div
                     class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
                 ></div>
@@ -314,7 +336,21 @@ export default {
         selectedMonthLabel() {
             if (!this.selectedMonth) return '';
             const [year, month] = this.selectedMonth.split('-');
-            return `${year}年${parseInt(month)}月`;
+            const monthNames = [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+            ];
+            return `${monthNames[parseInt(month) - 1]} ${year}`;
         },
         visiblePages() {
             const pages = [];
@@ -331,6 +367,23 @@ export default {
         },
     },
     methods: {
+        getMonthName(month) {
+            const monthNames = [
+                'Jan',
+                'Feb',
+                'Mar',
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+            ];
+            return monthNames[month - 1];
+        },
         isValidMonth(year, month) {
             const now = new Date();
             const currentYear = now.getFullYear();
@@ -398,7 +451,7 @@ export default {
                     this.updateCurrentPageData();
                 }
             } catch (error) {
-                console.error('获取论文数据失败:', error);
+                console.error('Failed to fetch paper data:', error);
                 this.loadError = error.message;
                 const fallbackData = this.papersByMonth[this.selectedMonth] || [];
                 if (fallbackData.length > 0) {
@@ -438,7 +491,7 @@ export default {
                     url: paper.url,
                 }));
             } else {
-                throw new Error('API返回数据格式错误');
+                throw new Error('Invalid API response format');
             }
         },
         calculateTotalPages() {
@@ -536,7 +589,7 @@ export default {
             return authors.substring(0, maxLength) + '...';
         },
         formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('zh-CN');
+            return new Date(dateString).toLocaleDateString('en-US');
         },
     },
     mounted() {
