@@ -89,10 +89,17 @@
                         <input
                             type="text"
                             v-model="filterKeyword"
-                            @input="filterPapers"
+                            @input="debouncedSearch"
+                            @keyup.enter="filterPapers"
                             placeholder="Enter keywords to filter papers..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
+                        <button
+                            @click="filterPapers"
+                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base whitespace-nowrap"
+                        >
+                            Search
+                        </button>
                         <button
                             @click="clearFilter"
                             v-if="filterKeyword"
@@ -109,7 +116,7 @@
                     <p class="text-gray-600 mb-2 sm:mb-0">
                         {{ selectedMonthLabel }} Page {{ currentPage }} of {{ totalPages }}
                         <span v-if="filterKeyword" class="text-blue-600">
-                            ({{ filteredPapers.length }} papers after filtering)
+                            (filtered by "{{ filterKeyword }}")
                         </span>
                     </p>
                     <div class="text-sm text-gray-500">Sorted by Citations</div>
@@ -126,7 +133,8 @@
                         ></div>
                         <p class="text-lg font-medium text-gray-700 mb-2">Loading Papers...</p>
                         <p class="text-sm text-gray-500">
-                            Fetching data for {{ selectedMonthLabel }}
+                            Fetching page {{ currentPage }} for {{ selectedMonthLabel }}
+                            <span v-if="filterKeyword">(filtered by "{{ filterKeyword }}")</span>
                         </p>
                     </div>
                 </div>
@@ -311,11 +319,10 @@
                             ? 'No matching papers found'
                             : 'No papers available for this month'
                     }}
-                </div>
-                <p class="text-gray-500">
+                </div<p class="text-gray-500">
                     {{
                         filterKeyword
-                            ? 'Try different keywords or select another month'
+                            ? 'Try different keywords, select another month, or check another page'
                             : 'Please select another month'
                     }}
                 </p>
@@ -341,8 +348,6 @@ export default {
             selectedYear: '',
             selectedMonthOnly: '',
             filterKeyword: '',
-            allMonthlyPapers: [],
-            filteredPapers: [],
             displayedPapers: [],
             isLoading: false,
             loadError: null,
@@ -352,6 +357,7 @@ export default {
             startYear: 2020,
             endYear: new Date().getFullYear(),
             endMonth: new Date().getMonth() + 1,
+            searchTimeout: null,
             papersByMonth: {
                 '2020-01': [
                     {
@@ -473,8 +479,6 @@ export default {
         onYearChange() {
             this.selectedMonthOnly = '';
             this.selectedMonth = '';
-            this.allMonthlyPapers = [];
-            this.filteredPapers = [];
             this.displayedPapers = [];
             this.currentPage = 1;
             this.totalPages = 1;
@@ -508,44 +512,25 @@ export default {
             this.loadError = null;
             try {
                 const monthParam = this.selectedMonth.replace('-', '');
-                await this.loadAllMonthData(monthParam);
-                if (this.filterKeyword.trim()) {
-                    this.filterPapers();
-                } else {
-                    this.calculateTotalPages();
-                    this.updateCurrentPageData();
-                }
+                const keyword = this.filterKeyword.trim() || 'dft_keyword';
+                await this.loadPageData(monthParam, keyword, this.currentPage);
             } catch (error) {
                 console.error('Failed to fetch paper data:', error);
                 this.loadError = error.message;
-                const fallbackData = this.papersByMonth[this.selectedMonth] || [];
-                if (fallbackData.length > 0) {
-                    this.allMonthlyPapers = fallbackData.sort((a, b) => b.citations - a.citations);
-                    if (this.filterKeyword.trim()) {
-                        this.filterPapers();
-                    } else {
-                        this.calculateTotalPages();
-                        this.updateCurrentPageData();
-                    }
-                    this.loadError = null;
-                } else {
-                    this.allMonthlyPapers = [];
-                    this.filteredPapers = [];
-                    this.displayedPapers = [];
-                    this.totalPages = 1;
-                    this.currentPage = 1;
-                }
+                this.displayedPapers = [];
+                this.totalPages = 1;
+                this.currentPage = 1;
             }
             this.isLoading = false;
         },
-        async loadAllMonthData(monthParam) {
-            const response = await fetch(`${data_url}/meta/${monthParam}`);
+        async loadPageData(monthParam, keyword, page) {
+            const response = await fetch(`${data_url}/meta/${monthParam}/${keyword}/${page}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
             if (result.ret === 'ok' && result.data) {
-                this.allMonthlyPapers = result.data.map((paper) => ({
+                this.displayedPapers = result.data.map((paper) => ({
                     id: paper.id,
                     title: paper.title,
                     authors: paper.authors,
@@ -555,72 +540,57 @@ export default {
                     keywords: paper.keywords || [],
                     url: paper.url,
                 }));
+                this.totalPages = result.page_count || 1;
             } else {
                 throw new Error('Invalid API response format');
             }
         },
-        calculateTotalPages() {
-            const dataLength = this.filterKeyword.trim()
-                ? this.filteredPapers.length
-                : this.allMonthlyPapers.length;
-            this.totalPages = Math.max(1, Math.ceil(dataLength / this.pageSize));
+        
+        async filterPapers() {
+            if (!this.selectedMonth) return;
+            
+            this.currentPage = 1;
+            await this.loadMonthlyPapers();
         },
-        updateCurrentPageData() {
-            const startIndex = (this.currentPage - 1) * this.pageSize;
-            const endIndex = startIndex + this.pageSize;
-            const sourceData = this.filterKeyword.trim()
-                ? this.filteredPapers
-                : this.allMonthlyPapers;
-            this.displayedPapers = sourceData.slice(startIndex, endIndex);
-        },
-        filterPapers() {
-            if (!this.filterKeyword.trim()) {
-                this.filteredPapers = [];
-                this.currentPage = 1;
-                this.calculateTotalPages();
-                this.updateCurrentPageData();
-                return;
+        debouncedSearch() {
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
             }
-            const keyword = this.filterKeyword.toLowerCase();
-            this.filteredPapers = this.allMonthlyPapers.filter(
-                (paper) =>
-                    paper.title.toLowerCase().includes(keyword) ||
-                    paper.authors.toLowerCase().includes(keyword) ||
-                    paper.keywords.some((k) => k.toLowerCase().includes(keyword)),
-            );
-            this.currentPage = 1;
-            this.calculateTotalPages();
-            this.updateCurrentPageData();
+            this.searchTimeout = setTimeout(() => {
+                this.filterPapers();
+            }, 500);
         },
-        filterByKeyword(keyword) {
+        async filterByKeyword(keyword) {
             this.filterKeyword = keyword;
-            this.filterPapers();
+            await this.filterPapers();
         },
-        clearFilter() {
+        async clearFilter() {
             this.filterKeyword = '';
-            this.filteredPapers = [];
             this.currentPage = 1;
-            this.calculateTotalPages();
-            this.updateCurrentPageData();
+            if (this.selectedMonth) {
+                await this.loadMonthlyPapers();
+            }
         },
-        changePage(page) {
+        async changePage(page) {
             if (page < 1 || page > this.totalPages || page === this.currentPage) {
                 return;
             }
             this.currentPage = page;
-            this.updateCurrentPageData();
+            if (this.selectedMonth) {
+                await this.loadMonthlyPapers();
+            }
         },
-        goToFirstPage() {
-            this.changePage(1);
+        async goToFirstPage() {
+            await this.changePage(1);
         },
-        goToLastPage() {
-            this.changePage(this.totalPages);
+        async goToLastPage() {
+            await this.changePage(this.totalPages);
         },
-        goToPrevPage() {
-            this.changePage(this.currentPage - 1);
+        async goToPrevPage() {
+            await this.changePage(this.currentPage - 1);
         },
-        goToNextPage() {
-            this.changePage(this.currentPage + 1);
+        async goToNextPage() {
+            await this.changePage(this.currentPage + 1);
         },
         openArxivLink(arxivId) {
             window.open(`https://arxiv.org/abs/${arxivId}`, '_blank');
