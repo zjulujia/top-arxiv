@@ -19,7 +19,7 @@
                                 <div
                                     class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50"
                                 >
-                                    <div class="text-center">
+                                    <div class="text-left">
                                         <div class="text-xs space-y-0.5">
                                             <div>cs.AI - Artificial Intelligence</div>
                                             <div>cs.CV - Computer Vision</div>
