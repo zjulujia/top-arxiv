@@ -4,9 +4,9 @@
         <header class="bg-white shadow-sm border-b w-full">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                    ArXiv AI Paper Rankings
+                    ArXiv AI Paper Ranking
                     <span class="text-gray-600 text-sm sm:text-base ml-4">
-                        All ArXiv AI Papers This Month Sorted by Citations Daily Updated
+                        All ArXiv AI Papers, Sorted by Citations, Daily Updating
                     </span>
                 </h1>
             </div>
