@@ -1,11 +1,38 @@
 <template>
     <div class="min-h-screen bg-gray-50 w-full overflow-y-scroll">
         <!-- Header -->
-        <header class="bg-white shadow-sm border-b w-full"<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <header class="bg-white shadow-sm border-b w-full">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                     ArXiv AI Paper Ranking
                     <span class="text-gray-600 text-sm sm:text-base ml-4">
-                        All ArXiv AI Papers, Sorted by Citations, Daily Updating
+                        All ArXiv
+                        <span class="relative inline-block">
+                            AI Papers
+                            <div class="group relative inline-block ml-1">
+                                <span
+                                    class="inline-flex items-center justify-center w-4 h-4 text-xs bg-blue-100 text-blue-600 rounded-full cursor-help hover:bg-blue-200 transition-colors"
+                                >
+                                    ?
+                                </span>
+                                <!-- Tooltip -->
+                                <div
+                                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50"
+                                >
+                                    <div class="text-center">
+                                        <div class="font-medium mb-1">AI Paper Categories:</div>
+                                        <div class="text-xs space-y-0.5">
+                                            cs.AI, cs.CV, cs.LG, cs.CL
+                                        </div>
+                                    </div>
+                                    <!-- Tooltip arrow -->
+                                    <div
+                                        class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"
+                                    ></div>
+                                </div>
+                            </div>
+                        </span>
+                        , Sorted by Citations, Daily Updating
                     </span>
                 </h1>
             </div>
@@ -85,12 +112,13 @@
                     </p>
                     <div class="text-sm text-gray-500">Sorted by Citations</div>
                 </div>
-            </div<!-- Loading Block for Paper List -->
+            </div>
+            <!-- Loading Block for Paper List -->
             <div v-if="isLoading && selectedMonth" class="relative min-h-screen">
                 <div
                     class="absolute inset-0 bg-white bg-opacity-75 backdrop-blur-sm z-10 rounded-lg"
                 >
-                    <div class="flex flex-col items-center justify-center" style="height: 50vh;">
+                    <div class="flex flex-col items-center justify-center" style="height: 50vh">
                         <div
                             class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mb-4"
                         ></div>
@@ -102,7 +130,11 @@
                 </div>
                 <!-- Placeholder content to maintain layout and prevent scrollbar jumping -->
                 <div class="space-y-6 opacity-30">
-                    <div v-for="i in Math.max(15, pageSize / 5)" :key="i" class="bg-gray-100 rounded-lg p-6 animate-pulse">
+                    <div
+                        v-for="i in Math.max(15, pageSize / 5)"
+                        :key="i"
+                        class="bg-gray-100 rounded-lg p-6 animate-pulse"
+                    >
                         <div class="flex items-start gap-4 mb-4">
                             <div class="w-8 h-8 bg-gray-200 rounded-full"></div>
                             <div class="flex-1">
