@@ -9,7 +9,6 @@
                         <input
                             type="text"
                             v-model="filterKeyword"
-                            @input="debouncedSearch"
                             @keyup.enter="filterPapers"
                             placeholder="Enter keywords to search all papers..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
@@ -31,7 +30,7 @@
                 </div>
             </div>
             <!-- Results -->
-            <div v-if="displayedPapers.length > 0 && !isLoading" class="mb-4">
+            <div v-if="displayedPapers.length > 0 && !isLoading && hasSearched" class="mb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                     <p class="text-gray-600 mb-2 sm:mb-0">
                         All Papers - Page {{ currentPage }} of {{ totalPages }}
@@ -269,7 +268,7 @@ export default {
             currentPage: 1,
             totalPages: 1,
             pageSize: 100,
-            searchTimeout: null,
+            hasSearched: false, // 添加标记是否已经搜索过
         };
     },
     computed: {
@@ -337,16 +336,12 @@ export default {
             }
         },
         async filterPapers() {
-            this.currentPage = 1;
-            await this.loadSearchResults();
-        },
-        debouncedSearch() {
-            if (this.searchTimeout) {
-                clearTimeout(this.searchTimeout);
+            if (!this.filterKeyword.trim()) {
+                return;
             }
-            this.searchTimeout = setTimeout(() => {
-                this.filterPapers();
-            }, 500);
+            this.currentPage = 1;
+            this.hasSearched = true;
+            await this.loadSearchResults();
         },
         async filterByKeyword(keyword) {
             this.filterKeyword = keyword;
@@ -357,6 +352,7 @@ export default {
             this.displayedPapers = [];
             this.currentPage = 1;
             this.totalPages = 1;
+            this.hasSearched = false;
         },
         async changePage(page) {
             if (page < 1 || page > this.totalPages || page === this.currentPage) {
