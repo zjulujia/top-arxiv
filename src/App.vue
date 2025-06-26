@@ -63,14 +63,14 @@
             </div>
         </header<!-- Page Navigation -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div class="flex gap-1 bg-gray-100 rounded-md p-1 w-fit">
+            <div class="flex gap-1 bg-blue-100 rounded-md p-1 w-fit border border-blue-200">
                 <button
                     @click="switchView('monthly')"
                     :class="[
                         'px-3 py-1.5 text-sm font-medium rounded transition-all duration-200',
                         currentView === 'monthly'
-                            ? 'bg-white text-gray-900 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-blue-700 hover:bg-blue-200'
                     ]"
                 >
                     📅 Monthly
@@ -80,8 +80,8 @@
                     :class="[
                         'px-3 py-1.5 text-sm font-medium rounded transition-all duration-200',
                         currentView === 'search'
-                            ? 'bg-white text-gray-900 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-blue-700 hover:bg-blue-200'
                     ]"
                 >
                     🔍 Search
