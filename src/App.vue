@@ -62,34 +62,34 @@
                 </div>
             </div>
         </header<!-- Page Navigation -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex gap-2 bg-white rounded-lg p-2 shadow-sm border border-gray-200 w-fit">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+            <div class="flex gap-1 bg-gray-100 rounded-md p-1 w-fit">
                 <button
                     @click="switchView('monthly')"
                     :class="[
-                        'px-4 py-2 text-sm font-medium rounded-md transition-all duration-200',
+                        'px-3 py-1.5 text-sm font-medium rounded transition-all duration-200',
                         currentView === 'monthly'
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'text-gray-700 hover:bg-gray-100'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
                     ]"
                 >
-                    📅 Monthly View
+                    📅 Monthly
                 </button>
                 <button
                     @click="switchView('search')"
                     :class="[
-                        'px-4 py-2 text-sm font-medium rounded-md transition-all duration-200',
+                        'px-3 py-1.5 text-sm font-medium rounded transition-all duration-200',
                         currentView === 'search'
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'text-gray-700 hover:bg-gray-100'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
                     ]"
                 >
-                    🔍 Global Search
+                    🔍 Search
                 </button>
             </div>
         </div>
         <!-- Monthly View -->
-        <div v-if="currentView === 'monthly'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div v-if="currentView === 'monthly'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
                 <!-- Month Selection -->
                 <div class="mb-6">
