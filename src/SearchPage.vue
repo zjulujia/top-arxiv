@@ -229,7 +229,13 @@
             </div>
             <!-- No results -->
             <div
-                v-if="displayedPapers.length === 0 && !isLoading && !loadError && filterKeyword"
+                v-if="
+                    displayedPapers.length === 0 &&
+                    !isLoading &&
+                    !loadError &&
+                    hasSearched &&
+                    filterKeyword
+                "
                 class="text-center py-12"
             >
                 <div class="text-6xl mb-4">📄</div>
@@ -240,7 +246,7 @@
                 </div>
             </div>
             <!-- No search performed -->
-            <div v-if="!filterKeyword && !isLoading" class="text-center py-12">
+            <div v-if="!hasSearched && !isLoading" class="text-center py-12">
                 <div class="text-6xl mb-4">🔍</div>
                 <div class="text-gray-400 text-lg mb-2">Enter keywords to search</div>
                 <p class="text-gray-500">Search across all papers by entering keywords above</p>
@@ -310,10 +316,8 @@ export default {
             this.isLoading = false;
         },
         async loadPageData(keyword, page) {
-            // 使用一个特殊的月份参数来搜索所有月份，或者根据API文档调整
-            // 这里假设API支持使用 'all' 或者空字符串来搜索所有月份
-            // 如果API不支持，可能需要调整为具体的实现方式
-            const monthParam = 'all_months'; // 或者根据实际API调整
+            // 使用 'all' 作为月份参数来搜索所有月份
+            const monthParam = 'all_months';
             const response = await fetch(`${data_url}/meta/${monthParam}/${keyword}/${page}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
