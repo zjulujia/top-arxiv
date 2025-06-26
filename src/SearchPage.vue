@@ -37,6 +37,7 @@
                         <span v-if="filterKeyword" class="text-blue-600">
                             (filtered by "{{ filterKeyword }}")
                         </span>
+                        <span v-else class="text-gray-500"> (default results) </span>
                     </p>
                     <div class="text-sm text-gray-500">Sorted by Citations</div>
                 </div>
@@ -294,17 +295,10 @@ export default {
     },
     methods: {
         async loadSearchResults() {
-            if (!this.filterKeyword.trim()) {
-                this.displayedPapers = [];
-                this.totalPages = 1;
-                this.currentPage = 1;
-                return;
-            }
-
             this.isLoading = true;
             this.loadError = null;
             try {
-                const keyword = this.filterKeyword.trim();
+                const keyword = this.filterKeyword.trim() || 'dft_keyword';
                 await this.loadPageData(keyword, this.currentPage);
             } catch (error) {
                 console.error('Failed to fetch paper data:', error);
@@ -340,9 +334,6 @@ export default {
             }
         },
         async filterPapers() {
-            if (!this.filterKeyword.trim()) {
-                return;
-            }
             this.currentPage = 1;
             this.hasSearched = true;
             await this.loadSearchResults();
@@ -408,6 +399,10 @@ export default {
         formatDate(dateString) {
             return new Date(dateString).toLocaleDateString('en-US');
         },
+    },
+    mounted() {
+        // 页面加载时自动显示默认结果
+        this.filterPapers();
     },
 };
 </script>
