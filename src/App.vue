@@ -61,9 +61,35 @@
                     </a>
                 </div>
             </div>
-        </header>
-        <!-- Control Section -->
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        </header<!-- Page Navigation -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex gap-2 bg-white rounded-lg p-2 shadow-sm border border-gray-200 w-fit">
+                <button
+                    @click="switchView('monthly')"
+                    :class="[
+                        'px-4 py-2 text-sm font-medium rounded-md transition-all duration-200',
+                        currentView === 'monthly'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-gray-700 hover:bg-gray-100'
+                    ]"
+                >
+                    📅 Monthly View
+                </button>
+                <button
+                    @click="switchView('search')"
+                    :class="[
+                        'px-4 py-2 text-sm font-medium rounded-md transition-all duration-200',
+                        currentView === 'search'
+                            ? 'bg-blue-600 text-white shadow-sm'
+                            : 'text-gray-700 hover:bg-gray-100'
+                    ]"
+                >
+                    🔍 Global Search
+                </button>
+            </div>
+        </div>
+        <!-- Monthly View -->
+        <div v-if="currentView === 'monthly'" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
                 <!-- Month Selection -->
                 <div class="mb-6">
@@ -356,17 +382,24 @@
                 <p class="text-gray-500">Select a month to view recommended papers</p>
             </div>
         </div>
+        <!-- Search View -->
+        <SearchPage v-if="currentView === 'search'" />
     </div>
 </template>
 
 <script>
+import SearchPage from './SearchPage.vue';
 
 const data_url = import.meta.env.VITE_API_BASE_URL;
 
 export default {
     name: 'App',
+    components: {
+        SearchPage,
+    },
     data() {
         return {
+            currentView: 'monthly', // 'monthly' or 'search'
             selectedMonth: '',
             selectedYear: '',
             selectedMonthOnly: '',
@@ -460,7 +493,20 @@ export default {
             return pages;
         },
     },
+    watch: {
+        currentView(newView) {
+            // 当切换页面时，可以在这里添加一些清理逻辑
+            if (newView === 'monthly') {
+                // 切换到月度视图时的逻辑
+            } else if (newView === 'search') {
+                // 切换到搜索视图时的逻辑
+            }
+        }
+    },
     methods: {
+        switchView(view) {
+            this.currentView = view;
+        },
         getMonthName(month) {
             const monthNames = [
                 'Jan',
