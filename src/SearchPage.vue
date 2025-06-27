@@ -13,6 +13,17 @@
                             placeholder="Enter keywords to search all papers (separate multiple keywords with commas)..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
+                        <div class="flex items-center gap-2 px-4 py-3 bg-gray-50 rounded-lg border border-gray-300">
+                            <input
+                                type="checkbox"
+                                id="match-all-search"
+                                v-model="matchAllKeywords"
+                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                            />
+                            <label for="match-all-search" class="text-sm text-gray-700 whitespace-nowrap cursor-pointer">
+                                Match All Keywords
+                            </label>
+                        </div>
                         <button
                             @click="filterPapers"
                             class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base whitespace-nowrap"
@@ -268,6 +279,7 @@ export default {
     data() {
         return {
             filterKeyword: '',
+            matchAllKeywords: false,
             displayedPapers: [],
             isLoading: false,
             loadError: null,
@@ -320,7 +332,8 @@ export default {
                 start_month: null, // 全局搜索不限制月份范围
                 end_month: null,
                 page: page,
-                keywords: keywords
+                keywords: keywords,
+                match_all_keywords: this.matchAllKeywords
             };
 
             const response = await fetch(`${data_url}/meta`, {
