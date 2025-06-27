@@ -143,33 +143,55 @@
                             placeholder="Enter keywords to filter papers (separate multiple keywords with commas)..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
-                        <div class="flex items-center gap-3 px-3 py-3 bg-gray-50 rounded-lg border border-gray-300">
-                            <span class="text-sm text-gray-700 font-medium">Keywords:</span>
-                            <div class="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    id="keywords-and-monthly"
-                                    name="match-type-monthly"
-                                    :value="true"
-                                    v-model="matchAllKeywords"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                                />
-                                <label for="keywords-and-monthly" class="text-sm text-gray-700 cursor-pointer">
-                                    And
-                                </label>
+                        <div class="relative">
+                            <div 
+                                @click="toggleKeywordsDropdown"
+                                class="flex items-center gap-2 px-3 py-3 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer hover:bg-gray-100 transition-colors"
+                            >
+                                <span class="text-sm text-gray-700 font-medium">Keywords:</span>
+                                <span class="text-sm text-blue-600 font-medium">{{ matchAllKeywords ? 'And' : 'Or' }}</span>
+                                <svg 
+                                    class="w-4 h-4 text-gray-500 transition-transform duration-200"
+                                    :class="{ 'rotate-180': showKeywordsDropdown }"
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <input
-                                    type="radio"
-                                    id="keywords-or-monthly"
-                                    name="match-type-monthly"
-                                    :value="false"
-                                    v-model="matchAllKeywords"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                                />
-                                <label for="keywords-or-monthly" class="text-sm text-gray-700 cursor-pointer">
-                                    Or
-                                </label>
+                            <div 
+                                v-if="showKeywordsDropdown"
+                                class="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-full"
+                            >
+                                <div class="p-2 space-y-2">
+                                    <div class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer" @click="selectKeywordOption(true)">
+                                        <input
+                                            type="radio"
+                                            id="keywords-and-monthly"
+                                            name="match-type-monthly"
+                                            :value="true"
+                                            v-model="matchAllKeywords"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                                        />
+                                        <label for="keywords-and-monthly" class="text-sm text-gray-700 cursor-pointer">
+                                            And
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer" @click="selectKeywordOption(false)">
+                                        <input
+                                            type="radio"
+                                            id="keywords-or-monthly"
+                                            name="match-type-monthly"
+                                            :value="false"
+                                            v-model="matchAllKeywords"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                                        />
+                                        <label for="keywords-or-monthly" class="text-sm text-gray-700 cursor-pointer">
+                                            Or
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <button
@@ -438,6 +460,7 @@ export default {
             selectedMonthOnly: '',
             filterKeyword: '',
             matchAllKeywords: false,
+            showKeywordsDropdown: false,
             displayedPapers: [],
             isLoading: false,
             loadError: null,
@@ -750,6 +773,13 @@ export default {
         },
         formatDate(dateString) {
             return new Date(dateString).toLocaleDateString('en-US');
+        },
+        toggleKeywordsDropdown() {
+            this.showKeywordsDropdown = !this.showKeywordsDropdown;
+        },
+        selectKeywordOption(value) {
+            this.matchAllKeywords = value;
+            this.showKeywordsDropdown = false;
         },
     },
     mounted() {
