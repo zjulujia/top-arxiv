@@ -18,19 +18,6 @@
                             <div class="flex items-center gap-2">
                                 <input
                                     type="radio"
-                                    id="keywords-or-search"
-                                    name="match-type-search"
-                                    :value="false"
-                                    v-model="matchAllKeywords"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                                />
-                                <label for="keywords-or-search" class="text-sm text-gray-700 cursor-pointer">
-                                    Or
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input
-                                    type="radio"
                                     id="keywords-and-search"
                                     name="match-type-search"
                                     :value="true"
@@ -39,6 +26,19 @@
                                 />
                                 <label for="keywords-and-search" class="text-sm text-gray-700 cursor-pointer">
                                     And
+                                </label>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input
+                                    type="radio"
+                                    id="keywords-or-search"
+                                    name="match-type-search"
+                                    :value="false"
+                                    v-model="matchAllKeywords"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
+                                />
+                                <label for="keywords-or-search" class="text-sm text-gray-700 cursor-pointer">
+                                    Or
                                 </label>
                             </div>
                         </div>
