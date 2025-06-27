@@ -140,7 +140,7 @@
                             v-model="filterKeyword"
                             @input="debouncedSearch"
                             @keyup.enter="filterPapers"
-                            placeholder="Enter keywords to filter papers..."
+                            placeholder="Enter keywords to filter papers (separate multiple keywords with commas)..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
                         <button
@@ -166,6 +166,9 @@
                         {{ selectedMonthLabel }} Page {{ currentPage }} of {{ totalPages }}
                         <span v-if="filterKeyword" class="text-blue-600">
                             (filtered by "{{ filterKeyword }}")
+                        </span>
+                        <span v-else class="text-gray-500">
+                            (all papers)
                         </span>
                     </p>
                     <div class="text-sm text-gray-500">Sorted by Citations</div>
@@ -581,8 +584,8 @@ export default {
             this.loadError = null;
             try {
                 const monthParam = this.selectedMonth.replace('-', '');
-                const keyword = this.filterKeyword.trim() || 'dft_keyword';
-                await this.loadPageData(monthParam, keyword, this.currentPage);
+                const keywords = this.filterKeyword.trim();
+                await this.loadPageData(monthParam, keywords, this.currentPage);
             } catch (error) {
                 console.error('Failed to fetch paper data:', error);
                 this.loadError = error.message;
@@ -592,12 +595,19 @@ export default {
             }
             this.isLoading = false;
         },
-        async loadPageData(monthParam, keyword, page) {
+        async loadPageData(monthParam, keywordString, page) {
+            let keywords = null;
+            
+            if (keywordString && keywordString.trim() && keywordString !== 'dft_keyword') {
+                // 将关键词字符串用逗号分割成数组，支持多关键词搜索
+                keywords = keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
+            }
+
             const requestBody = {
                 start_month: monthParam,
                 end_month: monthParam,
                 page: page,
-                keywords: keyword && keyword !== 'dft_keyword' ? [keyword] : null
+                keywords: keywords
             };
 
             const response = await fetch(`${data_url}/meta`, {
