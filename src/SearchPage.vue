@@ -450,8 +450,8 @@ export default {
             monthList: [], // 月份列表
             selectedStartYear: 2020,
             selectedStartMonthNum: 1,
-            selectedEndYear: 2024,
-            selectedEndMonthNum: 12,
+            selectedEndYear: new Date().getFullYear(),
+            selectedEndMonthNum: new Date().getMonth() + 1,
             availableYears: [2020, 2021, 2022, 2023, 2024],
             monthNames: {
                 1: 'January', 2: 'February', 3: 'March', 4: 'April',
@@ -628,10 +628,20 @@ export default {
             this.showKeywordsDropdown = false;
         },
         initializeMonthList() {
-            // 生成从2020年1月到2024年12月的月份列表
+            // 生成从2020年1月到当前月份的月份列表
             this.monthList = [];
-            for (let year = 2020; year <= 2024; year++) {
-                const maxMonth = year === 2024 ? 12 : 12;
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            
+            // 生成可用年份列表
+            this.availableYears = [];
+            for (let year = 2020; year <= Math.min(currentYear, 2024); year++) {
+                this.availableYears.push(year);
+            }
+            
+            for (let year = 2020; year <= Math.min(currentYear, 2024); year++) {
+                const maxMonth = year === currentYear ? currentMonth : 12;
                 for (let month = 1; month <= maxMonth; month++) {
                     this.monthList.push({
                         value: year * 100 + month,
@@ -639,6 +649,9 @@ export default {
                     });
                 }
             }
+            
+            // 更新maxMonth为实际的最大索引
+            this.maxMonth = this.monthList.length - 1;
         },
         getMonthDisplay(index) {
             if (index >= 0 && index < this.monthList.length) {
@@ -724,13 +737,15 @@ export default {
                 const currentYear = currentDate.getFullYear();
                 const currentMonth = currentDate.getMonth() + 1;
                 
-                // 设置结束日期为当前月份或最大可用月份
-                let endYear = Math.min(currentYear, 2024);
-                let endMonth = currentYear <= 2024 ? currentMonth : 12;
+                // 设置结束日期为当前月份
+                let endYear = currentYear;
+                let endMonth = currentMonth;
                 
                 // 确保不超过我们的数据范围
-                if (endYear > 2024 || (endYear === 2024 && endMonth > 12)) {
+                if (endYear > 2024) {
                     endYear = 2024;
+                    endMonth = 12;
+                } else if (endYear === 2024 && endMonth > 12) {
                     endMonth = 12;
                 }
                 
@@ -764,6 +779,10 @@ export default {
     mounted() {
         // 初始化月份列表
         this.initializeMonthList();
+        
+        // 设置默认的结束月份为当前月份
+        this.endMonth = this.maxMonth;
+        
         // 初始化选择器状态
         this.updateStartSelectors();
         this.updateEndSelectors();
