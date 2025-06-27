@@ -371,10 +371,11 @@
                             ? 'No matching papers found'
                             : 'No papers available for this month'
                     }}
-                </div<p class="text-gray-500">
+                </div>
+                <p class="text-gray-500">
                     {{
                         filterKeyword
-                            ? 'Try different keywords, select another month, or check another page'
+                            ? 'Try different keywords (separate multiple keywords with commas), select another month, or check another page'
                             : 'Please select another month'
                     }}
                 </p>
