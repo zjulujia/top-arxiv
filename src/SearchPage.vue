@@ -10,7 +10,7 @@
                             type="text"
                             v-model="filterKeyword"
                             @keyup.enter="filterPapers"
-                            placeholder="Enter keywords to search all papers (separate multiple keywords with spaces)..."
+                            placeholder="Enter keywords to search all papers (separate multiple keywords with commas)..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
                         <button
@@ -252,7 +252,7 @@
                         💡 Tips: Try keywords like "transformer", "attention", "BERT", "GPT", etc.
                     </p>
                     <p class="mt-2">
-                        🔍 You can search multiple keywords separated by spaces
+                        🔍 You can search multiple keywords separated by commas (e.g., "transformer, attention")
                     </p>
                 </div>
             </div>
@@ -312,8 +312,8 @@ export default {
             let keywords = null;
             
             if (keywordString && keywordString.trim()) {
-                // 将关键词字符串分割成数组，支持多关键词搜索
-                keywords = keywordString.trim().split(/\s+/).filter(kw => kw.length > 0);
+                // 将关键词字符串用逗号分割成数组，支持多关键词搜索
+                keywords = keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
             }
 
             const requestBody = {
