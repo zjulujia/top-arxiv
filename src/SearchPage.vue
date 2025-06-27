@@ -1,3 +1,56 @@
+computed: { visiblePages() { const pages = []; const maxVisible = 5; let start = Math.max(1,
+this.currentPage - Math.floor(maxVisible / 2)); let end = Math.min(this.totalPages, start +
+maxVisible - 1); if (end - start + 1 < maxVisible) { start = Math.max(1, end - maxVisible + 1); }
+for (let i = start; i <= end; i++) { pages.push(i); } return pages; }, }, watch: { startMonth() { if
+(this.hasSearched) { this.currentPage = 1; this.loadSearchResults(); } }, endMonth() { if
+(this.hasSearched) { this.currentPage = 1; this.loadSearchResults(); } }, }, methods: { async
+loadSearchResults() { this.isLoading = true; this.loadError = null; try { const keywords =
+this.filterKeyword.trim(); await this.loadPageData(keywords, this.currentPage); } catch (error) {
+console.error('Failed to fetch paper data:', error); this.loadError = error.message;
+this.displayedPapers = []; this.totalPages = 1; this.currentPage = 1; } this.isLoading = false; },
+async loadPageData(keywordString, page) { let keywords = null; if (keywordString &&
+keywordString.trim()) { // 将关键词字符串用逗号分割成数组，支持多关键词搜索 keywords =
+keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0); } const
+requestBody = { start_month: this.getMonthValue(this.startMonth), end_month:
+this.getMonthValue(this.endMonth), page: page, keywords: keywords, match_all_keywords:
+this.matchAllKeywords }; const response = await fetch(`${data_url}/meta`, { method: 'POST', headers:
+{ 'Content-Type': 'application/json', }, body: JSON.stringify(requestBody) }); if (!response.ok) {
+throw new Error(`HTTP error! status: ${response.status}`); } const result = await response.json();
+if (result.ret === 'ok' && result.data) { this.displayedPapers = result.data.map((paper) => ({ id:
+paper.id, title: paper.title, authors: paper.authors, citations: paper.citations, arxivId:
+this.extractArxivId(paper.url), publishedDate: this.formatPublishedDate(paper.publishedMonth),
+keywords: paper.keywords || [], url: paper.url, })); this.totalPages = result.page_count || 1; }
+else { throw new Error('Invalid API response format'); } }, async filterPapers() { this.currentPage
+= 1; this.hasSearched = true; await this.loadSearchResults(); }, async filterByKeyword(keyword) {
+this.filterKeyword = keyword; await this.filterPapers(); }, async clearFilter() { this.filterKeyword
+= ''; this.currentPage = 1; this.hasSearched = true; await this.loadSearchResults(); }, async
+changePage(page) { if (page < 1 || page > this.totalPages || page === this.currentPage) { return; }
+this.currentPage = page; await this.loadSearchResults(); }, async goToFirstPage() { await
+this.changePage(1); }, async goToLastPage() { await this.changePage(this.totalPages); }, async
+goToPrevPage() { await this.changePage(this.currentPage - 1); }, async goToNextPage() { await
+this.changePage(this.currentPage + 1); }, formatNumber(num) { return num.toLocaleString(); },
+extractArxivId(url) { const match = url.match(/arxiv\.org\/pdf\/([^\/]+)/); return match ? match[1]
+: ''; }, formatPublishedDate(publishedMonth) { if (publishedMonth && publishedMonth.length === 6) {
+const year = publishedMonth.substring(0, 4); const month = publishedMonth.substring(4, 6); return
+`${year}-${month}-01`; } return ''; }, openPaperLink(paper) { if (paper.url) {
+window.open(paper.url, '_blank'); } else if (paper.arxivId) {
+window.open(`https://arxiv.org/abs/${paper.arxivId}`, '_blank'); } }, truncateAuthors(authors,
+maxLength) { if (!authors || authors.length <= maxLength) { return authors; } return
+authors.substring(0, maxLength) + '...'; }, formatDate(dateString) { return new
+Date(dateString).toLocaleDateString('en-US'); }, toggleKeywordsDropdown() {
+this.showKeywordsDropdown = !this.showKeywordsDropdown; }, selectKeywordOption(value) {
+this.matchAllKeywords = value; this.showKeywordsDropdown = false; }, initializeMonthList() { //
+生成从2020年1月到2024年12月的月份列表 this.monthList = []; for (let year = 2020; year <= 2024;
+year++) { const maxMonth = year === 2024 ? 12 : 12; for (let month = 1; month <= maxMonth; month++)
+{ this.monthList.push({ value: year * 100 + month, display: `${year}-${month.toString().padStart(2,
+'0')}` }); } } }, getMonthDisplay(index) { if (index >= 0 && index < this.monthList.length) { return
+this.monthList[index].display; } return ''; }, getMonthValue(index) { if (index >= 0 && index <
+this.monthList.length) { return this.monthList[index].value; } return null; }, onStartMonthChange()
+{ // 确保开始月份不大于结束月份 if (this.startMonth > this.endMonth) { this.endMonth =
+this.startMonth; } }, onEndMonthChange() { // 确保结束月份不小于开始月份 if (this.endMonth <
+this.startMonth) { this.startMonth = this.endMonth; } }, resetMonthRange() { this.startMonth = 0;
+this.endMonth = this.maxMonth; }, }, mounted() { // 初始化月份列表 this.initializeMonthList(); //
+页面加载时自动显示默认结果 this.filterPapers(); },
 <template>
     <div class="min-h-screen bg-gray-50 w-full overflow-y-scroll">
         <!-- Control Section -->
@@ -18,29 +71,41 @@
                     </div>
                     <div class="space-y-4">
                         <!-- Range Display -->
-                        <div class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                        <div
+                            class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg"
+                        >
                             <div class="flex items-center gap-2">
                                 <span class="font-medium">From:</span>
-                                <span class="text-blue-600 font-semibold">{{ getMonthDisplay(startMonth) }}</span>
+                                <span class="text-blue-600 font-semibold">{{
+                                    getMonthDisplay(startMonth)
+                                }}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="font-medium">To:</span>
-                                <span class="text-blue-600 font-semibold">{{ getMonthDisplay(endMonth) }}</span>
+                                <span class="text-blue-600 font-semibold">{{
+                                    getMonthDisplay(endMonth)
+                                }}</span>
                             </div>
                         </div>
-                        
+
                         <!-- Dual Range Slider -->
                         <div class="relative px-2">
                             <div class="relative h-2 bg-gray-200 rounded-lg">
                                 <!-- Active range background -->
-                                <div 
+                                <div
                                     class="absolute h-2 bg-blue-500 rounded-lg"
                                     :style="{
-                                        left: ((startMonth - minMonth) / (maxMonth - minMonth)) * 100 + '%',
-                                        width: ((endMonth - startMonth) / (maxMonth - minMonth)) * 100 + '%'
+                                        left:
+                                            ((startMonth - minMonth) / (maxMonth - minMonth)) *
+                                                100 +
+                                            '%',
+                                        width:
+                                            ((endMonth - startMonth) / (maxMonth - minMonth)) *
+                                                100 +
+                                            '%',
                                     }"
                                 ></div>
-                                
+
                                 <!-- Start month slider -->
                                 <input
                                     type="range"
@@ -51,7 +116,7 @@
                                     @input="onStartMonthChange"
                                     class="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
                                 />
-                                
+
                                 <!-- End month slider -->
                                 <input
                                     type="range"
@@ -64,7 +129,7 @@
                                 />
                             </div>
                         </div>
-                        
+
                         <!-- Month labels -->
                         <div class="flex justify-between text-xs text-gray-500 px-2">
                             <span>2020-01</span>
@@ -75,7 +140,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Keyword Filter -->
                 <div>
                     <div class="flex flex-col sm:flex-row gap-4">
@@ -87,28 +152,38 @@
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
                         <div class="relative">
-                            <div 
+                            <div
                                 @click="toggleKeywordsDropdown"
                                 class="flex items-center gap-2 px-3 py-3 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer hover:bg-gray-100 transition-colors"
                             >
                                 <span class="text-sm text-gray-700 font-medium">Keywords:</span>
-                                <span class="text-sm text-gray-700 font-medium">{{ matchAllKeywords ? 'And' : 'Or' }}</span>
-                                <svg 
+                                <span class="text-sm text-gray-700 font-medium">{{
+                                    matchAllKeywords ? 'And' : 'Or'
+                                }}</span>
+                                <svg
                                     class="w-4 h-4 text-gray-500 transition-transform duration-200"
                                     :class="{ 'rotate-180': showKeywordsDropdown }"
-                                    fill="none" 
-                                    stroke="currentColor" 
+                                    fill="none"
+                                    stroke="currentColor"
                                     viewBox="0 0 24 24"
                                 >
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M19 9l-7 7-7-7"
+                                    ></path>
                                 </svg>
                             </div>
-                            <div 
+                            <div
                                 v-if="showKeywordsDropdown"
                                 class="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-full"
                             >
                                 <div class="p-2 space-y-2">
-                                    <div class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer" @click="selectKeywordOption(true)">
+                                    <div
+                                        class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
+                                        @click="selectKeywordOption(true)"
+                                    >
                                         <input
                                             type="radio"
                                             id="keywords-and-search"
@@ -117,11 +192,17 @@
                                             v-model="matchAllKeywords"
                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
                                         />
-                                        <label for="keywords-and-search" class="text-sm text-gray-700 cursor-pointer">
+                                        <label
+                                            for="keywords-and-search"
+                                            class="text-sm text-gray-700 cursor-pointer"
+                                        >
                                             And
                                         </label>
                                     </div>
-                                    <div class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer" @click="selectKeywordOption(false)">
+                                    <div
+                                        class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer"
+                                        @click="selectKeywordOption(false)"
+                                    >
                                         <input
                                             type="radio"
                                             id="keywords-or-search"
@@ -130,7 +211,10 @@
                                             v-model="matchAllKeywords"
                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
                                         />
-                                        <label for="keywords-or-search" class="text-sm text-gray-700 cursor-pointer">
+                                        <label
+                                            for="keywords-or-search"
+                                            class="text-sm text-gray-700 cursor-pointer"
+                                        >
                                             Or
                                         </label>
                                     </div>
@@ -366,7 +450,8 @@
                 <div class="text-sm text-gray-400">
                     <p>💡 Try different keywords, check spelling, or use broader terms</p>
                 </div>
-            </div<!-- No search performed -->
+            </div>
+            <!-- No search performed -->
             <div v-if="!hasSearched && !isLoading" class="text-center py-12">
                 <div class="text-6xl mb-4">🔍</div>
                 <div class="text-gray-400 text-lg mb-2">Enter keywords to search</div>
@@ -376,7 +461,8 @@
                         💡 Tips: Try keywords like "transformer", "attention", "BERT", "GPT", etc.
                     </p>
                     <p class="mt-2">
-                        🔍 You can search multiple keywords separated by commas (e.g., "transformer, attention")
+                        🔍 You can search multiple keywords separated by commas (e.g., "transformer,
+                        attention")
                     </p>
                 </div>
             </div>
@@ -407,6 +493,215 @@ export default {
             maxMonth: 59, // 最大月份索引 (2020-01 到 2024-12, 共60个月)
             monthList: [], // 月份列表
         };
+    },
+    computed: {
+        visiblePages() {
+            const pages = [];
+            const maxVisible = 5;
+            let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+            let end = Math.min(this.totalPages, start + maxVisible - 1);
+            if (end - start + 1 < maxVisible) {
+                start = Math.max(1, end - maxVisible + 1);
+            }
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+            return pages;
+        },
+    },
+    watch: {
+        startMonth() {
+            if (this.hasSearched) {
+                this.currentPage = 1;
+                this.loadSearchResults();
+            }
+        },
+        endMonth() {
+            if (this.hasSearched) {
+                this.currentPage = 1;
+                this.loadSearchResults();
+            }
+        },
+    },
+    methods: {
+        async loadSearchResults() {
+            this.isLoading = true;
+            this.loadError = null;
+            try {
+                const keywords = this.filterKeyword.trim();
+                await this.loadPageData(keywords, this.currentPage);
+            } catch (error) {
+                console.error('Failed to fetch paper data:', error);
+                this.loadError = error.message;
+                this.displayedPapers = [];
+                this.totalPages = 1;
+                this.currentPage = 1;
+            }
+            this.isLoading = false;
+        },
+        async loadPageData(keywordString, page) {
+            let keywords = null;
+
+            if (keywordString && keywordString.trim()) {
+                // 将关键词字符串用逗号分割成数组，支持多关键词搜索
+                keywords = keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
+            }
+
+            const requestBody = {
+                start_month: this.getMonthValue(this.startMonth),
+                end_month: this.getMonthValue(this.endMonth),
+                page: page,
+                keywords: keywords,
+                match_all_keywords: this.matchAllKeywords
+            };
+
+            const response = await fetch(`${data_url}/meta`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            if (result.ret === 'ok' && result.data) {
+                this.displayedPapers = result.data.map((paper) => ({
+                    id: paper.id,
+                    title: paper.title,
+                    authors: paper.authors,
+                    citations: paper.citations,
+                    arxivId: this.extractArxivId(paper.url),
+                    publishedDate: this.formatPublishedDate(paper.publishedMonth),
+                    keywords: paper.keywords || [],
+                    url: paper.url,
+                }));
+                this.totalPages = result.page_count || 1;
+            } else {
+                throw new Error('Invalid API response format');
+            }
+        },
+        async filterPapers() {
+            this.currentPage = 1;
+            this.hasSearched = true;
+            await this.loadSearchResults();
+        },
+        async filterByKeyword(keyword) {
+            this.filterKeyword = keyword;
+            await this.filterPapers();
+        },
+        async clearFilter() {
+            this.filterKeyword = '';
+            this.currentPage = 1;
+            this.hasSearched = true;
+            await this.loadSearchResults();
+        },
+        async changePage(page) {
+            if (page < 1 || page > this.totalPages || page === this.currentPage) {
+                return;
+            }
+            this.currentPage = page;
+            await this.loadSearchResults();
+        },
+        async goToFirstPage() {
+            await this.changePage(1);
+        },
+        async goToLastPage() {
+            await this.changePage(this.totalPages);
+        },
+        async goToPrevPage() {
+            await this.changePage(this.currentPage - 1);
+        },
+        async goToNextPage() {
+            await this.changePage(this.currentPage + 1);
+        },
+        formatNumber(num) {
+            return num.toLocaleString();
+        },
+        extractArxivId(url) {
+            const match = url.match(/arxiv\.org\/pdf\/([^\/]+)/);
+            return match ? match[1] : '';
+        },
+        formatPublishedDate(publishedMonth) {
+            if (publishedMonth && publishedMonth.length === 6) {
+                const year = publishedMonth.substring(0, 4);
+                const month = publishedMonth.substring(4, 6);
+                return `${year}-${month}-01`;
+            }
+            return '';
+        },
+        openPaperLink(paper) {
+            if (paper.url) {
+                window.open(paper.url, '_blank');
+            } else if (paper.arxivId) {
+                window.open(`https://arxiv.org/abs/${paper.arxivId}`, '_blank');
+            }
+        },
+        truncateAuthors(authors, maxLength) {
+            if (!authors || authors.length <= maxLength) {
+                return authors;
+            }
+            return authors.substring(0, maxLength) + '...';
+        },
+        formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US');
+        },
+        toggleKeywordsDropdown() {
+            this.showKeywordsDropdown = !this.showKeywordsDropdown;
+        },
+        selectKeywordOption(value) {
+            this.matchAllKeywords = value;
+            this.showKeywordsDropdown = false;
+        },
+        initializeMonthList() {
+            // 生成从2020年1月到2024年12月的月份列表
+            this.monthList = [];
+            for (let year = 2020; year <= 2024; year++) {
+                const maxMonth = year === 2024 ? 12 : 12;
+                for (let month = 1; month <= maxMonth; month++) {
+                    this.monthList.push({
+                        value: year * 100 + month,
+                        display: `${year}-${month.toString().padStart(2, '0')}`
+                    });
+                }
+            }
+        },
+        getMonthDisplay(index) {
+            if (index >= 0 && index < this.monthList.length) {
+                return this.monthList[index].display;
+            }
+            return '';
+        },
+        getMonthValue(index) {
+            if (index >= 0 && index < this.monthList.length) {
+                return this.monthList[index].value;
+            }
+            return null;
+        },
+        onStartMonthChange() {
+            // 确保开始月份不大于结束月份
+            if (this.startMonth > this.endMonth) {
+                this.endMonth = this.startMonth;
+            }
+        },
+        onEndMonthChange() {
+            // 确保结束月份不小于开始月份
+            if (this.endMonth < this.startMonth) {
+                this.startMonth = this.endMonth;
+            }
+        },
+        resetMonthRange() {
+            this.startMonth = 0;
+            this.endMonth = this.maxMonth;
+        },
+    },
+    mounted() {
+        // 初始化月份列表
+        this.initializeMonthList();
+        // 页面加载时自动显示默认结果
+        this.filterPapers();
     },
 =======
     computed: {
@@ -456,7 +751,7 @@ export default {
         },
         async loadPageData(keywordString, page) {
             let keywords = null;
-            
+
             if (keywordString && keywordString.trim()) {
                 // 将关键词字符串用逗号分割成数组，支持多关键词搜索
                 keywords = keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
