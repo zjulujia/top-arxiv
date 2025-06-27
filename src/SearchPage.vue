@@ -230,18 +230,15 @@
             </div>
             <!-- No results -->
             <div
-                v-if="
-                    displayedPapers.length === 0 &&
-                    !isLoading &&
-                    !loadError &&
-                    hasSearched &&
-                    filterKeyword
-                "
+                v-if="displayedPapers.length === 0 && !isLoading && !loadError && hasSearched"
                 class="text-center py-12"
             >
                 <div class="text-6xl mb-4">📄</div>
                 <div class="text-gray-400 text-lg mb-2">No matching papers found</div>
-                <p class="text-gray-500 mb-4">No papers found for "{{ filterKeyword }}"</p>
+                <p class="text-gray-500 mb-4" v-if="filterKeyword">
+                    No papers found for "{{ filterKeyword }}"
+                </p>
+                <p class="text-gray-500 mb-4" v-else>No default papers available</p>
                 <div class="text-sm text-gray-400">
                     <p>💡 Try different keywords, check spelling, or use broader terms</p>
                 </div>
@@ -311,7 +308,7 @@ export default {
         },
         async loadPageData(keyword, page) {
             // 使用 'all' 作为月份参数来搜索所有月份
-            const monthParam = 'all_months';
+            const monthParam = 'all';
             const response = await fetch(`${data_url}/meta/${monthParam}/${keyword}/${page}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -344,10 +341,9 @@ export default {
         },
         async clearFilter() {
             this.filterKeyword = '';
-            this.displayedPapers = [];
             this.currentPage = 1;
-            this.totalPages = 1;
-            this.hasSearched = false;
+            this.hasSearched = true;
+            await this.loadSearchResults();
         },
         async changePage(page) {
             if (page < 1 || page > this.totalPages || page === this.currentPage) {
