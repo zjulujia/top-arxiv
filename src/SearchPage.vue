@@ -199,11 +199,106 @@ computed: {
         resetMonthRange() {
             this.startMonth = 0;
             this.endMonth = this.maxMonth;
+            this.selectedStartYear = 2020;
+            this.selectedStartMonthNum = 1;
+            this.selectedEndYear = 2024;
+            this.selectedEndMonthNum = 12;
+        },
+        updateStartMonth() {
+            // 根据选择的年月更新startMonth索引
+            const targetValue = this.selectedStartYear * 100 + this.selectedStartMonthNum;
+            const index = this.monthList.findIndex(month => month.value === targetValue);
+            if (index !== -1) {
+                this.startMonth = index;
+                // 确保开始日期不晚于结束日期
+                if (this.startMonth > this.endMonth) {
+                    this.endMonth = this.startMonth;
+                    this.updateEndSelectors();
+                }
+            }
+        },
+        updateEndMonth() {
+            // 根据选择的年月更新endMonth索引
+            const targetValue = this.selectedEndYear * 100 + this.selectedEndMonthNum;
+            const index = this.monthList.findIndex(month => month.value === targetValue);
+            if (index !== -1) {
+                this.endMonth = index;
+                // 确保结束日期不早于开始日期
+                if (this.endMonth < this.startMonth) {
+                    this.startMonth = this.endMonth;
+                    this.updateStartSelectors();
+                }
+            }
+        },
+        updateStartSelectors() {
+            // 根据startMonth索引更新选择器
+            if (this.startMonth >= 0 && this.startMonth < this.monthList.length) {
+                const monthValue = this.monthList[this.startMonth].value;
+                this.selectedStartYear = Math.floor(monthValue / 100);
+                this.selectedStartMonthNum = monthValue % 100;
+            }
+        },
+        updateEndSelectors() {
+            // 根据endMonth索引更新选择器
+            if (this.endMonth >= 0 && this.endMonth < this.monthList.length) {
+                const monthValue = this.monthList[this.endMonth].value;
+                this.selectedEndYear = Math.floor(monthValue / 100);
+                this.selectedEndMonthNum = monthValue % 100;
+            }
+        },
+        applyDatePreset(preset) {
+            if (preset.months === null) {
+                // All Time
+                this.resetMonthRange();
+            } else {
+                // 计算从当前日期往前的月份
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1;
+                
+                // 设置结束日期为当前月份或最大可用月份
+                let endYear = Math.min(currentYear, 2024);
+                let endMonth = currentYear <= 2024 ? currentMonth : 12;
+                
+                // 确保不超过我们的数据范围
+                if (endYear > 2024 || (endYear === 2024 && endMonth > 12)) {
+                    endYear = 2024;
+                    endMonth = 12;
+                }
+                
+                // 计算开始日期
+                let startYear = endYear;
+                let startMonth = endMonth - preset.months + 1;
+                
+                while (startMonth <= 0) {
+                    startYear--;
+                    startMonth += 12;
+                }
+                
+                // 确保不早于我们的数据范围
+                if (startYear < 2020 || (startYear === 2020 && startMonth < 1)) {
+                    startYear = 2020;
+                    startMonth = 1;
+                }
+                
+                // 更新选择器
+                this.selectedStartYear = startYear;
+                this.selectedStartMonthNum = startMonth;
+                this.selectedEndYear = endYear;
+                this.selectedEndMonthNum = endMonth;
+                
+                // 更新索引
+                this.updateStartMonth();
+                this.updateEndMonth();
+            }
         },
     },
     mounted() {
         // 初始化月份列表
         this.initializeMonthList();
+        // 初始化选择器状态
+        this.updateStartSelectors();
+        this.updateEndSelectors();
         // 页面加载时自动显示默认结果
         this.filterPapers();
     },
@@ -211,58 +306,19 @@ computed: {
 </script>
 
 <style scoped>
-/* Custom range slider styles */
-.slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    pointer-events: none;
-}
-
-.slider-thumb::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #3b82f6;
-    border: 2px solid #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    pointer-events: all;
-    position: relative;
-    z-index: 1;
-}
-
-.slider-thumb::-moz-range-thumb {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #3b82f6;
-    border: 2px solid #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    pointer-events: all;
-    border: none;
-}
-
-.slider-thumb::-webkit-slider-track {
-    background: transparent;
-}
-
-.slider-thumb::-moz-range-track {
-    background: transparent;
-}
-
-.slider-thumb:focus {
+/* Custom styles for the elegant month selector */
+select:focus {
     outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.slider-thumb:focus::-webkit-slider-thumb {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+.date-preset-button {
+    transition: all 0.2s ease-in-out;
 }
 
-.slider-thumb:focus::-moz-range-thumb {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+.date-preset-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style><template>
     <div class="min-h-screen bg-gray-50 w-full overflow-y-scroll">
@@ -271,85 +327,94 @@ computed: {
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
                 <!-- Month Range Filter -->
                 <div class="mb-6">
-                    <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center justify-between mb-4">
                         <label class="block text-sm font-medium text-gray-700">
-                            Month Range Filter
+                            📅 Publication Date Range
                         </label>
                         <button
                             @click="resetMonthRange"
-                            class="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                            class="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
                         >
-                            Reset Range
+                            Reset to All Time
                         </button>
                     </div>
-                    <div class="space-y-4">
-                        <!-- Range Display -->
-                        <div
-                            class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg"
-                        >
-                            <div class="flex items-center gap-2">
-                                <span class="font-medium">From:</span>
-                                <span class="text-blue-600 font-semibold">{{
-                                    getMonthDisplay(startMonth)
-                                }}</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-medium">To:</span>
-                                <span class="text-blue-600 font-semibold">{{
-                                    getMonthDisplay(endMonth)
-                                }}</span>
-                            </div>
-                        </div>
-
-                        <!-- Dual Range Slider -->
-                        <div class="relative px-2">
-                            <div class="relative h-2 bg-gray-200 rounded-lg">
-                                <!-- Active range background -->
-                                <div
-                                    class="absolute h-2 bg-blue-500 rounded-lg"
-                                    :style="{
-                                        left:
-                                            ((startMonth - minMonth) / (maxMonth - minMonth)) *
-                                                100 +
-                                            '%',
-                                        width:
-                                            ((endMonth - startMonth) / (maxMonth - minMonth)) *
-                                                100 +
-                                            '%',
-                                    }"
-                                ></div>
-
-                                <!-- Start month slider -->
-                                <input
-                                    type="range"
-                                    :min="minMonth"
-                                    :max="maxMonth"
-                                    :step="1"
-                                    v-model.number="startMonth"
-                                    @input="onStartMonthChange"
-                                    class="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
-                                />
-
-                                <!-- End month slider -->
-                                <input
-                                    type="range"
-                                    :min="minMonth"
-                                    :max="maxMonth"
-                                    :step="1"
-                                    v-model.number="endMonth"
-                                    @input="onEndMonthChange"
-                                    class="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
-                                />
+                    
+                    <!-- Elegant Month Range Selector -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+                        <!-- Selected Range Display -->
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">From</span>
+                                    <span class="text-sm font-semibold text-blue-600">{{ getMonthDisplay(startMonth) }}</span>
+                                </div>
+                                <div class="w-8 h-px bg-gray-300"></div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">To</span>
+                                    <span class="text-sm font-semibold text-blue-600">{{ getMonthDisplay(endMonth) }}</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Month labels -->
-                        <div class="flex justify-between text-xs text-gray-500 px-2">
-                            <span>2020-01</span>
-                            <span>2021-01</span>
-                            <span>2022-01</span>
-                            <span>2023-01</span>
-                            <span>2024-12</span>
+                        <!-- Year and Month Grid Selector -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <!-- Start Date Selector -->
+                            <div class="bg-white rounded-lg p-3 border border-gray-200">
+                                <h4 class="text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">Start Date</h4>
+                                <div class="space-y-2">
+                                    <!-- Year Selector for Start -->
+                                    <select 
+                                        v-model="selectedStartYear" 
+                                        @change="updateStartMonth"
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+                                    </select>
+                                    <!-- Month Selector for Start -->
+                                    <select 
+                                        v-model="selectedStartMonthNum" 
+                                        @change="updateStartMonth"
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option v-for="(monthName, monthNum) in monthNames" :key="monthNum" :value="monthNum">{{ monthName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- End Date Selector -->
+                            <div class="bg-white rounded-lg p-3 border border-gray-200">
+                                <h4 class="text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">End Date</h4>
+                                <div class="space-y-2">
+                                    <!-- Year Selector for End -->
+                                    <select 
+                                        v-model="selectedEndYear" 
+                                        @change="updateEndMonth"
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+                                    </select>
+                                    <!-- Month Selector for End -->
+                                    <select 
+                                        v-model="selectedEndMonthNum" 
+                                        @change="updateEndMonth"
+                                        class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option v-for="(monthName, monthNum) in monthNames" :key="monthNum" :value="monthNum">{{ monthName }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Select Buttons -->
+                        <div class="mt-4 flex flex-wrap gap-2 justify-center">
+                            <button
+                                v-for="preset in datePresets"
+                                :key="preset.label"
+                                @click="applyDatePreset(preset)"
+                                class="px-3 py-1 text-xs font-medium bg-white text-gray-600 border border-gray-300 rounded-full hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
+                            >
+                                {{ preset.label }}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -705,6 +770,22 @@ export default {
             minMonth: 0, // 最小月份索引
             maxMonth: 59, // 最大月份索引 (2020-01 到 2024-12, 共60个月)
             monthList: [], // 月份列表
+            selectedStartYear: 2020,
+            selectedStartMonthNum: 1,
+            selectedEndYear: 2024,
+            selectedEndMonthNum: 12,
+            availableYears: [2020, 2021, 2022, 2023, 2024],
+            monthNames: {
+                1: 'January', 2: 'February', 3: 'March', 4: 'April',
+                5: 'May', 6: 'June', 7: 'July', 8: 'August',
+                9: 'September', 10: 'October', 11: 'November', 12: 'December'
+            },
+            datePresets: [
+                { label: 'Last 6 Months', months: 6 },
+                { label: 'Last Year', months: 12 },
+                { label: 'Last 2 Years', months: 24 },
+                { label: 'All Time', months: null }
+            ],
         };
     },
     computed: {
