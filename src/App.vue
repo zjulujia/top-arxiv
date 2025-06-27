@@ -143,7 +143,8 @@
                             placeholder="Enter keywords to filter papers (separate multiple keywords with commas)..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
-                        <div class="flex items-center gap-4 px-4 py-3 bg-gray-50 rounded-lg border border-gray-300">
+                        <div class="flex items-center gap-3 px-3 py-3 bg-gray-50 rounded-lg border border-gray-300">
+                            <span class="text-sm text-gray-700 font-medium">Keywords:</span>
                             <div class="flex items-center gap-2">
                                 <input
                                     type="radio"
@@ -153,8 +154,8 @@
                                     v-model="matchAllKeywords"
                                     class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
                                 />
-                                <label for="keywords-or-monthly" class="text-sm text-gray-700 whitespace-nowrap cursor-pointer">
-                                    Keywords Or
+                                <label for="keywords-or-monthly" class="text-sm text-gray-700 cursor-pointer">
+                                    Or
                                 </label>
                             </div>
                             <div class="flex items-center gap-2">
@@ -166,8 +167,8 @@
                                     v-model="matchAllKeywords"
                                     class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
                                 />
-                                <label for="keywords-and-monthly" class="text-sm text-gray-700 whitespace-nowrap cursor-pointer">
-                                    Keywords And
+                                <label for="keywords-and-monthly" class="text-sm text-gray-700 cursor-pointer">
+                                    And
                                 </label>
                             </div>
                         </div>
