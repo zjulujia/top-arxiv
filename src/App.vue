@@ -593,7 +593,21 @@ export default {
             this.isLoading = false;
         },
         async loadPageData(monthParam, keyword, page) {
-            const response = await fetch(`${data_url}/meta/${monthParam}/${keyword}/${page}`);
+            const requestBody = {
+                start_month: monthParam,
+                end_month: monthParam,
+                page: page,
+                keywords: keyword && keyword !== 'dft_keyword' ? [keyword] : null
+            };
+
+            const response = await fetch(`${data_url}/meta`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

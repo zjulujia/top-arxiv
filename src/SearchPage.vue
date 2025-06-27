@@ -10,7 +10,7 @@
                             type="text"
                             v-model="filterKeyword"
                             @keyup.enter="filterPapers"
-                            placeholder="Enter keywords to search all papers..."
+                            placeholder="Enter keywords to search all papers (separate multiple keywords with spaces)..."
                             class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
                         />
                         <button
@@ -242,8 +242,7 @@
                 <div class="text-sm text-gray-400">
                     <p>💡 Try different keywords, check spelling, or use broader terms</p>
                 </div>
-            </div>
-            <!-- No search performed -->
+            </div<!-- No search performed -->
             <div v-if="!hasSearched && !isLoading" class="text-center py-12">
                 <div class="text-6xl mb-4">🔍</div>
                 <div class="text-gray-400 text-lg mb-2">Enter keywords to search</div>
@@ -251,6 +250,9 @@
                 <div class="mt-6 text-sm text-gray-400">
                     <p>
                         💡 Tips: Try keywords like "transformer", "attention", "BERT", "GPT", etc.
+                    </p>
+                    <p class="mt-2">
+                        🔍 You can search multiple keywords separated by spaces
                     </p>
                 </div>
             </div>
@@ -295,8 +297,8 @@ export default {
             this.isLoading = true;
             this.loadError = null;
             try {
-                const keyword = this.filterKeyword.trim() || 'dft_keyword';
-                await this.loadPageData(keyword, this.currentPage);
+                const keywords = this.filterKeyword.trim();
+                await this.loadPageData(keywords, this.currentPage);
             } catch (error) {
                 console.error('Failed to fetch paper data:', error);
                 this.loadError = error.message;
@@ -306,10 +308,29 @@ export default {
             }
             this.isLoading = false;
         },
-        async loadPageData(keyword, page) {
-            // 使用 'all' 作为月份参数来搜索所有月份
-            const monthParam = 'all';
-            const response = await fetch(`${data_url}/meta/${monthParam}/${keyword}/${page}`);
+        async loadPageData(keywordString, page) {
+            let keywords = null;
+            
+            if (keywordString && keywordString.trim()) {
+                // 将关键词字符串分割成数组，支持多关键词搜索
+                keywords = keywordString.trim().split(/\s+/).filter(kw => kw.length > 0);
+            }
+
+            const requestBody = {
+                start_month: null, // 全局搜索不限制月份范围
+                end_month: null,
+                page: page,
+                keywords: keywords
+            };
+
+            const response = await fetch(`${data_url}/meta`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
