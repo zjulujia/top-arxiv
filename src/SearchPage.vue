@@ -19,7 +19,7 @@
                                 class="flex items-center gap-2 px-3 py-3 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer hover:bg-gray-100 transition-colors"
                             >
                                 <span class="text-sm text-gray-700 font-medium">Keywords:</span>
-                                <span class="text-sm text-blue-600 font-medium">{{ matchAllKeywords ? 'And' : 'Or' }}</span>
+                                <span class="text-sm text-gray-700 font-medium">{{ matchAllKeywords ? 'And' : 'Or' }}</span>
                                 <svg 
                                     class="w-4 h-4 text-gray-500 transition-transform duration-200"
                                     :class="{ 'rotate-180': showKeywordsDropdown }"
