@@ -3,6 +3,79 @@
         <!-- Control Section -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
+                <!-- Month Range Filter -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Month Range Filter
+                        </label>
+                        <button
+                            @click="resetMonthRange"
+                            class="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            Reset Range
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <!-- Range Display -->
+                        <div class="flex items-center justify-between text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium">From:</span>
+                                <span class="text-blue-600 font-semibold">{{ getMonthDisplay(startMonth) }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-medium">To:</span>
+                                <span class="text-blue-600 font-semibold">{{ getMonthDisplay(endMonth) }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Dual Range Slider -->
+                        <div class="relative px-2">
+                            <div class="relative h-2 bg-gray-200 rounded-lg">
+                                <!-- Active range background -->
+                                <div 
+                                    class="absolute h-2 bg-blue-500 rounded-lg"
+                                    :style="{
+                                        left: ((startMonth - minMonth) / (maxMonth - minMonth)) * 100 + '%',
+                                        width: ((endMonth - startMonth) / (maxMonth - minMonth)) * 100 + '%'
+                                    }"
+                                ></div>
+                                
+                                <!-- Start month slider -->
+                                <input
+                                    type="range"
+                                    :min="minMonth"
+                                    :max="maxMonth"
+                                    :step="1"
+                                    v-model.number="startMonth"
+                                    @input="onStartMonthChange"
+                                    class="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
+                                />
+                                
+                                <!-- End month slider -->
+                                <input
+                                    type="range"
+                                    :min="minMonth"
+                                    :max="maxMonth"
+                                    :step="1"
+                                    v-model.number="endMonth"
+                                    @input="onEndMonthChange"
+                                    class="absolute w-full h-2 bg-transparent appearance-none cursor-pointer slider-thumb"
+                                />
+                            </div>
+                        </div>
+                        
+                        <!-- Month labels -->
+                        <div class="flex justify-between text-xs text-gray-500 px-2">
+                            <span>2020-01</span>
+                            <span>2021-01</span>
+                            <span>2022-01</span>
+                            <span>2023-01</span>
+                            <span>2024-12</span>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Keyword Filter -->
                 <div>
                     <div class="flex flex-col sm:flex-row gap-4">
@@ -351,6 +424,20 @@ export default {
             return pages;
         },
     },
+    watch: {
+        startMonth() {
+            if (this.hasSearched) {
+                this.currentPage = 1;
+                this.loadSearchResults();
+            }
+        },
+        endMonth() {
+            if (this.hasSearched) {
+                this.currentPage = 1;
+                this.loadSearchResults();
+            }
+        },
+    },
     methods: {
         async loadSearchResults() {
             this.isLoading = true;
@@ -376,8 +463,8 @@ export default {
             }
 
             const requestBody = {
-                start_month: this.startMonth,
-                end_month: this.endMonth,
+                start_month: this.getMonthValue(this.startMonth),
+                end_month: this.getMonthValue(this.endMonth),
                 page: page,
                 keywords: keywords,
                 match_all_keywords: this.matchAllKeywords
@@ -483,14 +570,30 @@ export default {
             this.matchAllKeywords = value;
             this.showKeywordsDropdown = false;
         },
-        formatMonthDisplay(monthValue) {
-            const year = Math.floor(monthValue / 100);
-            const month = monthValue % 100;
-            const monthNames = [
-                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-            ];
-            return `${year}-${monthNames[month - 1]}`;
+        initializeMonthList() {
+            // 生成从2020年1月到2024年12月的月份列表
+            this.monthList = [];
+            for (let year = 2020; year <= 2024; year++) {
+                const maxMonth = year === 2024 ? 12 : 12;
+                for (let month = 1; month <= maxMonth; month++) {
+                    this.monthList.push({
+                        value: year * 100 + month,
+                        display: `${year}-${month.toString().padStart(2, '0')}`
+                    });
+                }
+            }
+        },
+        getMonthDisplay(index) {
+            if (index >= 0 && index < this.monthList.length) {
+                return this.monthList[index].display;
+            }
+            return '';
+        },
+        getMonthValue(index) {
+            if (index >= 0 && index < this.monthList.length) {
+                return this.monthList[index].value;
+            }
+            return null;
         },
         onStartMonthChange() {
             // 确保开始月份不大于结束月份
@@ -504,8 +607,14 @@ export default {
                 this.startMonth = this.endMonth;
             }
         },
+        resetMonthRange() {
+            this.startMonth = 0;
+            this.endMonth = this.maxMonth;
+        },
     },
     mounted() {
+        // 初始化月份列表
+        this.initializeMonthList();
         // 页面加载时自动显示默认结果
         this.filterPapers();
     },
