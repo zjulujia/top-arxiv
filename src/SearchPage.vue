@@ -328,8 +328,14 @@ export default {
             totalPages: 1,
             pageSize: 100,
             hasSearched: false, // 添加标记是否已经搜索过
+            startMonth: 0, // 默认开始月份索引
+            endMonth: 59, // 默认结束月份索引 (5年 * 12个月 - 1)
+            minMonth: 0, // 最小月份索引
+            maxMonth: 59, // 最大月份索引 (2020-01 到 2024-12, 共60个月)
+            monthList: [], // 月份列表
         };
     },
+=======
     computed: {
         visiblePages() {
             const pages = [];
@@ -370,8 +376,8 @@ export default {
             }
 
             const requestBody = {
-                start_month: null, // 全局搜索不限制月份范围
-                end_month: null,
+                start_month: this.startMonth,
+                end_month: this.endMonth,
                 page: page,
                 keywords: keywords,
                 match_all_keywords: this.matchAllKeywords
@@ -477,6 +483,27 @@ export default {
             this.matchAllKeywords = value;
             this.showKeywordsDropdown = false;
         },
+        formatMonthDisplay(monthValue) {
+            const year = Math.floor(monthValue / 100);
+            const month = monthValue % 100;
+            const monthNames = [
+                'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            ];
+            return `${year}-${monthNames[month - 1]}`;
+        },
+        onStartMonthChange() {
+            // 确保开始月份不大于结束月份
+            if (this.startMonth > this.endMonth) {
+                this.endMonth = this.startMonth;
+            }
+        },
+        onEndMonthChange() {
+            // 确保结束月份不小于开始月份
+            if (this.endMonth < this.startMonth) {
+                this.startMonth = this.endMonth;
+            }
+        },
     },
     mounted() {
         // 页面加载时自动显示默认结果
@@ -484,3 +511,59 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+/* Custom range slider styles */
+.slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: none;
+}
+
+.slider-thumb::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    pointer-events: all;
+    position: relative;
+    z-index: 1;
+}
+
+.slider-thumb::-moz-range-thumb {
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    pointer-events: all;
+    border: none;
+}
+
+.slider-thumb::-webkit-slider-track {
+    background: transparent;
+}
+
+.slider-thumb::-moz-range-track {
+    background: transparent;
+}
+
+.slider-thumb:focus {
+    outline: none;
+}
+
+.slider-thumb:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.slider-thumb:focus::-moz-range-thumb {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+</style>
