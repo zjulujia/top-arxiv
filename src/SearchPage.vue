@@ -761,8 +761,8 @@ export default {
             }
 
             const requestBody = {
-                start_month: this.getMonthValue(this.startMonth),
-                end_month: this.getMonthValue(this.endMonth),
+                start_month: this.getMonthValue(this.startMonth) ? this.getMonthValue(this.startMonth).toString() : null,
+                end_month: this.getMonthValue(this.endMonth) ? this.getMonthValue(this.endMonth).toString() : null,
                 page: page,
                 keywords: keywords,
                 match_all_keywords: this.matchAllKeywords
