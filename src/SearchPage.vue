@@ -707,7 +707,12 @@ export default {
 
             // 生成月份列表，只到当前月份
             for (let year = 2020; year <= Math.min(currentYear, 2024); year++) {
-                const maxMonth = year === currentYear ? currentMonth : 12;
+                const maxMonth =
+                    year === Math.min(currentYear, 2024)
+                        ? currentYear <= 2024
+                            ? currentMonth
+                            : 12
+                        : 12;
                 for (let month = 1; month <= maxMonth; month++) {
                     this.monthList.push({
                         value: year * 100 + month,
@@ -719,6 +724,10 @@ export default {
             // 设置最大月份索引和默认结束月份
             this.maxMonth = this.monthList.length - 1;
             this.endMonth = this.maxMonth; // 设置为当前月份
+
+            // 确保选择器也更新到当前月份
+            this.selectedEndYear = Math.min(currentYear, 2024);
+            this.selectedEndMonthNum = currentYear <= 2024 ? currentMonth : 12;
         },
         getMonthDisplay(index) {
             if (index >= 0 && index < this.monthList.length) {
