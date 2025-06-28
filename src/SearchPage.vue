@@ -58,7 +58,7 @@
                                 <div class="flex gap-2">
                                     <!-- Year Selector for Start -->
                                     <select
-                                        v-model="selectedStartYear"
+                                        v-model.number="selectedStartYear"
                                         @change="updateStartMonth"
                                         class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
@@ -72,14 +72,14 @@
                                     </select>
                                     <!-- Month Selector for Start -->
                                     <select
-                                        v-model="selectedStartMonthNum"
+                                        v-model.number="selectedStartMonthNum"
                                         @change="updateStartMonth"
                                         class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option
                                             v-for="(monthName, monthNum) in monthNames"
                                             :key="monthNum"
-                                            :value="monthNum"
+                                            :value="parseInt(monthNum)"
                                         >
                                             {{ monthName }}
                                         </option>
@@ -96,7 +96,7 @@
                                 <div class="flex gap-2">
                                     <!-- Year Selector for End -->
                                     <select
-                                        v-model="selectedEndYear"
+                                        v-model.number="selectedEndYear"
                                         @change="updateEndMonth"
                                         class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
@@ -110,14 +110,14 @@
                                     </select>
                                     <!-- Month Selector for End -->
                                     <select
-                                        v-model="selectedEndMonthNum"
+                                        v-model.number="selectedEndMonthNum"
                                         @change="updateEndMonth"
                                         class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
                                         <option
                                             v-for="(monthName, monthNum) in monthNames"
                                             :key="monthNum"
-                                            :value="monthNum"
+                                            :value="parseInt(monthNum)"
                                         >
                                             {{ monthName }}
                                         </option>
@@ -787,8 +787,15 @@ export default {
             this.endMonth = this.maxMonth;
         },
         updateStartMonth() {
-            const targetValue = this.selectedStartYear * 100 + this.selectedStartMonthNum;
+            console.log(
+                'updateStartMonth called:',
+                this.selectedStartYear,
+                this.selectedStartMonthNum,
+            );
+            const targetValue =
+                parseInt(this.selectedStartYear) * 100 + parseInt(this.selectedStartMonthNum);
             const index = this.monthList.findIndex((month) => month.value === targetValue);
+            console.log('Start month target value:', targetValue, 'found index:', index);
             if (index !== -1) {
                 this.startMonth = index;
                 if (this.startMonth > this.endMonth) {
@@ -798,8 +805,11 @@ export default {
             }
         },
         updateEndMonth() {
-            const targetValue = this.selectedEndYear * 100 + this.selectedEndMonthNum;
+            console.log('updateEndMonth called:', this.selectedEndYear, this.selectedEndMonthNum);
+            const targetValue =
+                parseInt(this.selectedEndYear) * 100 + parseInt(this.selectedEndMonthNum);
             const index = this.monthList.findIndex((month) => month.value === targetValue);
+            console.log('End month target value:', targetValue, 'found index:', index);
             if (index !== -1) {
                 this.endMonth = index;
                 if (this.endMonth < this.startMonth) {
@@ -876,9 +886,14 @@ export default {
     },
     mounted() {
         this.initializeMonthList();
-        this.updateStartSelectors();
-        this.updateEndSelectors();
-        this.filterPapers();
+        // 确保在初始化月份列表后再更新选择器
+        this.$nextTick(() => {
+            this.updateStartSelectors();
+            this.updateEndSelectors();
+            this.updateStartMonth();
+            this.updateEndMonth();
+            this.filterPapers();
+        });
     },
 };
 </script>
