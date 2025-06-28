@@ -712,8 +712,33 @@ export default {
             this.maxMonth = this.monthList.length - 1;
             this.endMonth = this.maxMonth;
 
+            // Set default to Last Year instead of All Time
+            let startYear = currentYear;
+            let startMonth = currentMonth - 12 + 1;
+
+            while (startMonth <= 0) {
+                startYear--;
+                startMonth += 12;
+            }
+
+            if (startYear < 2020 || (startYear === 2020 && startMonth < 1)) {
+                startYear = 2020;
+                startMonth = 1;
+            }
+
+            this.selectedStartYear = startYear;
+            this.selectedStartMonthNum = startMonth;
             this.selectedEndYear = currentYear;
             this.selectedEndMonthNum = currentMonth;
+
+            // Update startMonth index based on the calculated start date
+            const targetStartValue = startYear * 100 + startMonth;
+            const startIndex = this.monthList.findIndex(
+                (month) => month.value === targetStartValue,
+            );
+            if (startIndex !== -1) {
+                this.startMonth = startIndex;
+            }
         },
         getMonthDisplay(index) {
             if (index >= 0 && index < this.monthList.length) {
