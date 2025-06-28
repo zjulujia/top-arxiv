@@ -132,95 +132,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- Keyword Filter -->
-                <div>
-                    <div class="flex flex-col sm:flex-row gap-4">
-                        <input
-                            type="text"
-                            v-model="filterKeyword"
-                            @input="debouncedSearch"
-                            @keyup.enter="filterPapers"
-                            placeholder="Enter keywords to filter papers (separate multiple keywords with commas)..."
-                            class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm sm:text-base"
-                        />
-                        <div class="relative">
-                            <div 
-                                @click="toggleKeywordsDropdown"
-                                class="flex items-center gap-2 px-3 py-3 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer hover:bg-gray-100 transition-colors"
-                            >
-                                <span class="text-sm text-gray-700 font-medium">Keywords:</span>
-                                <span class="text-sm text-gray-700 font-medium">{{ matchAllKeywords ? 'And' : 'Or' }}</span>
-                                <svg 
-                                    class="w-4 h-4 text-gray-500 transition-transform duration-200"
-                                    :class="{ 'rotate-180': showKeywordsDropdown }"
-                                    fill="none" 
-                                    stroke="currentColor" 
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                                </svg>
-                            </div>
-                            <div 
-                                v-if="showKeywordsDropdown"
-                                class="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-full"
-                            >
-                                <div class="p-2 space-y-2">
-                                    <div class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer" @click="selectKeywordOption(true)">
-                                        <input
-                                            type="radio"
-                                            id="keywords-and-monthly"
-                                            name="match-type-monthly"
-                                            :value="true"
-                                            v-model="matchAllKeywords"
-                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                                        />
-                                        <label for="keywords-and-monthly" class="text-sm text-gray-700 cursor-pointer">
-                                            And
-                                        </label>
-                                    </div>
-                                    <div class="flex items-center gap-2 px-2 py-1 hover:bg-gray-50 rounded cursor-pointer" @click="selectKeywordOption(false)">
-                                        <input
-                                            type="radio"
-                                            id="keywords-or-monthly"
-                                            name="match-type-monthly"
-                                            :value="false"
-                                            v-model="matchAllKeywords"
-                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2"
-                                        />
-                                        <label for="keywords-or-monthly" class="text-sm text-gray-700 cursor-pointer">
-                                            Or
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button
-                            @click="filterPapers"
-                            class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base whitespace-nowrap"
-                        >
-                            Search
-                        </button>
-                        <button
-                            @click="clearFilter"
-                            v-if="filterKeyword"
-                            class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm sm:text-base whitespace-nowrap"
-                        >
-                            Clear Filter
-                        </button>
-                    </div>
-                </div>
+                =======
             </div>
             <!-- Results -->
             <div v-if="displayedPapers.length > 0 && !isLoading" class="mb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                     <p class="text-gray-600 mb-2 sm:mb-0">
                         {{ selectedMonthLabel }} Page {{ currentPage }} of {{ totalPages }}
-                        <span v-if="filterKeyword" class="text-blue-600">
-                            (filtered by "{{ filterKeyword }}")
-                        </span>
-                        <span v-else class="text-gray-500">
-                            (all papers)
-                        </span>
                     </p>
                     <div class="text-sm text-gray-500">Sorted by Citations</div>
                 </div>
@@ -237,7 +155,6 @@
                         <p class="text-lg font-medium text-gray-700 mb-2">Loading Papers...</p>
                         <p class="text-sm text-gray-500">
                             Fetching page {{ currentPage }} for {{ selectedMonthLabel }}
-                            <span v-if="filterKeyword">(filtered by "{{ filterKeyword }}")</span>
                         </p>
                     </div>
                 </div>
@@ -322,8 +239,7 @@
                             <span
                                 v-for="(keyword, keywordIndex) in paper.keywords"
                                 :key="keywordIndex"
-                                class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md border border-blue-200 hover:bg-blue-100 cursor-pointer transition-colors"
-                                @click="filterByKeyword(keyword)"
+                                class="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-md border border-blue-200"
                             >
                                 #{{ keyword }}
                             </span>
@@ -417,18 +333,10 @@
                 class="text-center py-12"
             >
                 <div class="text-gray-400 text-lg mb-2">
-                    {{
-                        filterKeyword
-                            ? 'No matching papers found'
-                            : 'No papers available for this month'
-                    }}
+                    No papers available for this month
                 </div>
                 <p class="text-gray-500">
-                    {{
-                        filterKeyword
-                            ? 'Try different keywords (separate multiple keywords with commas), select another month, or check another page'
-                            : 'Please select another month'
-                    }}
+                    Please select another month
                 </p>
             </div>
             <!-- No month selected -->
@@ -458,9 +366,6 @@ export default {
             selectedMonth: '',
             selectedYear: '',
             selectedMonthOnly: '',
-            filterKeyword: '',
-            matchAllKeywords: false,
-            showKeywordsDropdown: false,
             displayedPapers: [],
             isLoading: false,
             loadError: null,
@@ -470,7 +375,6 @@ export default {
             startYear: 2020,
             endYear: new Date().getFullYear(),
             endMonth: new Date().getMonth() + 1,
-            searchTimeout: null,
             papersByMonth: {
                 '2020-01': [
                     {
@@ -638,8 +542,7 @@ export default {
             this.loadError = null;
             try {
                 const monthParam = this.selectedMonth.replace('-', '');
-                const keywords = this.filterKeyword.trim();
-                await this.loadPageData(monthParam, keywords, this.currentPage);
+                await this.loadPageData(monthParam, this.currentPage);
             } catch (error) {
                 console.error('Failed to fetch paper data:', error);
                 this.loadError = error.message;
@@ -649,20 +552,13 @@ export default {
             }
             this.isLoading = false;
         },
-        async loadPageData(monthParam, keywordString, page) {
-            let keywords = null;
-            
-            if (keywordString && keywordString.trim() && keywordString !== 'dft_keyword') {
-                // 将关键词字符串用逗号分割成数组，支持多关键词搜索
-                keywords = keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-            }
-
+        async loadPageData(monthParam, page) {
             const requestBody = {
                 start_month: monthParam,
                 end_month: monthParam,
                 page: page,
-                keywords: keywords,
-                match_all_keywords: this.matchAllKeywords
+                keywords: null,
+                match_all_keywords: false
             };
 
             const response = await fetch(`${data_url}/meta`, {
@@ -694,31 +590,7 @@ export default {
             }
         },
         
-        async filterPapers() {
-            if (!this.selectedMonth) return;
-            
-            this.currentPage = 1;
-            await this.loadMonthlyPapers();
-        },
-        debouncedSearch() {
-            if (this.searchTimeout) {
-                clearTimeout(this.searchTimeout);
-            }
-            this.searchTimeout = setTimeout(() => {
-                this.filterPapers();
-            }, 500);
-        },
-        async filterByKeyword(keyword) {
-            this.filterKeyword = keyword;
-            await this.filterPapers();
-        },
-        async clearFilter() {
-            this.filterKeyword = '';
-            this.currentPage = 1;
-            if (this.selectedMonth) {
-                await this.loadMonthlyPapers();
-            }
-        },
+        
         async changePage(page) {
             if (page < 1 || page > this.totalPages || page === this.currentPage) {
                 return;
@@ -774,13 +646,7 @@ export default {
         formatDate(dateString) {
             return new Date(dateString).toLocaleDateString('en-US');
         },
-        toggleKeywordsDropdown() {
-            this.showKeywordsDropdown = !this.showKeywordsDropdown;
-        },
-        selectKeywordOption(value) {
-            this.matchAllKeywords = value;
-            this.showKeywordsDropdown = false;
-        },
+        
     },
     mounted() {
         const now = new Date();
