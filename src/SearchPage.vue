@@ -478,6 +478,10 @@ const data_url = import.meta.env.VITE_API_BASE_URL;
 export default {
     name: 'SearchPage',
     data() {
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1;
+
         return {
             filterKeyword: '',
             matchAllKeywords: false,
@@ -496,8 +500,8 @@ export default {
             monthList: [],
             selectedStartYear: 2020,
             selectedStartMonthNum: 1,
-            selectedEndYear: new Date().getFullYear(),
-            selectedEndMonthNum: new Date().getMonth() + 1,
+            selectedEndYear: Math.min(currentYear, 2024),
+            selectedEndMonthNum: currentYear <= 2024 ? currentMonth : 12,
             availableYears: [],
             monthNames: {
                 1: 'January',
@@ -735,9 +739,10 @@ export default {
             this.selectedStartMonthNum = 1;
             // 使用当前年月作为重置时的结束日期
             const currentDate = new Date();
-            this.selectedEndYear = Math.min(currentDate.getFullYear(), 2024);
-            this.selectedEndMonthNum =
-                currentDate.getFullYear() <= 2024 ? currentDate.getMonth() + 1 : 12;
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1;
+            this.selectedEndYear = Math.min(currentYear, 2024);
+            this.selectedEndMonthNum = currentYear <= 2024 ? currentMonth : 12;
         },
         updateStartMonth() {
             const targetValue = this.selectedStartYear * 100 + this.selectedStartMonthNum;
@@ -783,15 +788,9 @@ export default {
                 const currentYear = currentDate.getFullYear();
                 const currentMonth = currentDate.getMonth() + 1;
 
-                let endYear = currentYear;
-                let endMonth = currentMonth;
-
-                if (endYear > 2024) {
-                    endYear = 2024;
-                    endMonth = 12;
-                } else if (endYear === 2024 && endMonth > 12) {
-                    endMonth = 12;
-                }
+                // 确保结束日期始终是当前月份
+                let endYear = Math.min(currentYear, 2024);
+                let endMonth = currentYear <= 2024 ? currentMonth : 12;
 
                 let startYear = endYear;
                 let startMonth = endMonth - preset.months + 1;
