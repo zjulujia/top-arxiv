@@ -16,20 +16,34 @@
                             Reset to All Time
                         </button>
                     </div>
-                    
+
                     <!-- Elegant Month Range Selector -->
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+                    <div
+                        class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100"
+                    >
                         <!-- Selected Range Display -->
                         <div class="flex items-center justify-center mb-4">
-                            <div class="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border">
+                            <div
+                                class="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border"
+                            >
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">From</span>
-                                    <span class="text-sm font-semibold text-blue-600">{{ getMonthDisplay(startMonth) }}</span>
+                                    <span
+                                        class="text-xs font-medium text-gray-500 uppercase tracking-wide"
+                                        >From</span
+                                    >
+                                    <span class="text-sm font-semibold text-blue-600">{{
+                                        getMonthDisplay(startMonth)
+                                    }}</span>
                                 </div>
                                 <div class="w-8 h-px bg-gray-300"></div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">To</span>
-                                    <span class="text-sm font-semibold text-blue-600">{{ getMonthDisplay(endMonth) }}</span>
+                                    <span
+                                        class="text-xs font-medium text-gray-500 uppercase tracking-wide"
+                                        >To</span
+                                    >
+                                    <span class="text-sm font-semibold text-blue-600">{{
+                                        getMonthDisplay(endMonth)
+                                    }}</span>
                                 </div>
                             </div>
                         </div>
@@ -38,46 +52,78 @@
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                             <!-- Start Date Selector -->
                             <div class="bg-white rounded-lg p-3 border border-gray-200">
-                                <h4 class="text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">Start Date</h4>
+                                <h4
+                                    class="text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide"
+                                >
+                                    Start Date
+                                </h4>
                                 <div class="space-y-2">
                                     <!-- Year Selector for Start -->
-                                    <select 
-                                        v-model="selectedStartYear" 
+                                    <select
+                                        v-model="selectedStartYear"
                                         @change="updateStartMonth"
                                         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+                                        <option
+                                            v-for="year in availableYears"
+                                            :key="year"
+                                            :value="year"
+                                        >
+                                            {{ year }}
+                                        </option>
                                     </select>
                                     <!-- Month Selector for Start -->
-                                    <select 
-                                        v-model="selectedStartMonthNum" 
+                                    <select
+                                        v-model="selectedStartMonthNum"
                                         @change="updateStartMonth"
                                         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option v-for="(monthName, monthNum) in monthNames" :key="monthNum" :value="monthNum">{{ monthName }}</option>
+                                        <option
+                                            v-for="(monthName, monthNum) in monthNames"
+                                            :key="monthNum"
+                                            :value="monthNum"
+                                        >
+                                            {{ monthName }}
+                                        </option>
                                     </select>
                                 </div>
                             </div>
 
                             <!-- End Date Selector -->
                             <div class="bg-white rounded-lg p-3 border border-gray-200">
-                                <h4 class="text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide">End Date</h4>
+                                <h4
+                                    class="text-xs font-medium text-gray-600 mb-2 uppercase tracking-wide"
+                                >
+                                    End Date
+                                </h4>
                                 <div class="space-y-2">
                                     <!-- Year Selector for End -->
-                                    <select 
-                                        v-model="selectedEndYear" 
+                                    <select
+                                        v-model="selectedEndYear"
                                         @change="updateEndMonth"
                                         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option v-for="year in availableYears" :key="year" :value="year">{{ year }}</option>
+                                        <option
+                                            v-for="year in availableYears"
+                                            :key="year"
+                                            :value="year"
+                                        >
+                                            {{ year }}
+                                        </option>
                                     </select>
                                     <!-- Month Selector for End -->
-                                    <select 
-                                        v-model="selectedEndMonthNum" 
+                                    <select
+                                        v-model="selectedEndMonthNum"
                                         @change="updateEndMonth"
                                         class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     >
-                                        <option v-for="(monthName, monthNum) in monthNames" :key="monthNum" :value="monthNum">{{ monthName }}</option>
+                                        <option
+                                            v-for="(monthName, monthNum) in monthNames"
+                                            :key="monthNum"
+                                            :value="monthNum"
+                                        >
+                                            {{ monthName }}
+                                        </option>
                                     </select>
                                 </div>
                             </div>
@@ -442,27 +488,36 @@ export default {
             currentPage: 1,
             totalPages: 1,
             pageSize: 100,
-            hasSearched: false, // 添加标记是否已经搜索过
-            startMonth: 0, // 默认开始月份索引
-            endMonth: 59, // 默认结束月份索引 (5年 * 12个月 - 1)
-            minMonth: 0, // 最小月份索引
-            maxMonth: 59, // 最大月份索引 (2020-01 到 2024-12, 共60个月)
-            monthList: [], // 月份列表
+            hasSearched: false,
+            startMonth: 0,
+            endMonth: 0, // 将在初始化时设置为当前月份
+            minMonth: 0,
+            maxMonth: 0, // 将在初始化时计算
+            monthList: [],
             selectedStartYear: 2020,
             selectedStartMonthNum: 1,
             selectedEndYear: new Date().getFullYear(),
             selectedEndMonthNum: new Date().getMonth() + 1,
             availableYears: [],
             monthNames: {
-                1: 'January', 2: 'February', 3: 'March', 4: 'April',
-                5: 'May', 6: 'June', 7: 'July', 8: 'August',
-                9: 'September', 10: 'October', 11: 'November', 12: 'December'
+                1: 'January',
+                2: 'February',
+                3: 'March',
+                4: 'April',
+                5: 'May',
+                6: 'June',
+                7: 'July',
+                8: 'August',
+                9: 'September',
+                10: 'October',
+                11: 'November',
+                12: 'December',
             },
             datePresets: [
                 { label: 'Last 6 Months', months: 6 },
                 { label: 'Last Year', months: 12 },
                 { label: 'Last 2 Years', months: 24 },
-                { label: 'All Time', months: null }
+                { label: 'All Time', months: null },
             ],
         };
     },
@@ -515,16 +570,23 @@ export default {
             let keywords = null;
 
             if (keywordString && keywordString.trim()) {
-                // 将关键词字符串用逗号分割成数组，支持多关键词搜索
-                keywords = keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
+                keywords = keywordString
+                    .trim()
+                    .split(',')
+                    .map((kw) => kw.trim())
+                    .filter((kw) => kw.length > 0);
             }
 
             const requestBody = {
-                start_month: this.getMonthValue(this.startMonth) ? this.getMonthValue(this.startMonth).toString() : null,
-                end_month: this.getMonthValue(this.endMonth) ? this.getMonthValue(this.endMonth).toString() : null,
+                start_month: this.getMonthValue(this.startMonth)
+                    ? this.getMonthValue(this.startMonth).toString()
+                    : null,
+                end_month: this.getMonthValue(this.endMonth)
+                    ? this.getMonthValue(this.endMonth).toString()
+                    : null,
                 page: page,
                 keywords: keywords,
-                match_all_keywords: this.matchAllKeywords
+                match_all_keywords: this.matchAllKeywords,
             };
 
             const response = await fetch(`${data_url}/meta`, {
@@ -532,7 +594,7 @@ export default {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify(requestBody),
             });
 
             if (!response.ok) {
@@ -628,30 +690,31 @@ export default {
             this.showKeywordsDropdown = false;
         },
         initializeMonthList() {
-            // 生成从2020年1月到当前月份的月份列表
             this.monthList = [];
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
-            
+
             // 生成可用年份列表
             this.availableYears = [];
             for (let year = 2020; year <= Math.min(currentYear, 2024); year++) {
                 this.availableYears.push(year);
             }
-            
+
+            // 生成月份列表，只到当前月份
             for (let year = 2020; year <= Math.min(currentYear, 2024); year++) {
                 const maxMonth = year === currentYear ? currentMonth : 12;
                 for (let month = 1; month <= maxMonth; month++) {
                     this.monthList.push({
                         value: year * 100 + month,
-                        display: `${year}-${month.toString().padStart(2, '0')}`
+                        display: `${year}-${month.toString().padStart(2, '0')}`,
                     });
                 }
             }
-            
-            // 更新maxMonth为实际的最大索引
+
+            // 设置最大月份索引和默认结束月份
             this.maxMonth = this.monthList.length - 1;
+            this.endMonth = this.maxMonth; // 设置为当前月份
         },
         getMonthDisplay(index) {
             if (index >= 0 && index < this.monthList.length) {
@@ -665,18 +728,6 @@ export default {
             }
             return null;
         },
-        onStartMonthChange() {
-            // 确保开始月份不大于结束月份
-            if (this.startMonth > this.endMonth) {
-                this.endMonth = this.startMonth;
-            }
-        },
-        onEndMonthChange() {
-            // 确保结束月份不小于开始月份
-            if (this.endMonth < this.startMonth) {
-                this.startMonth = this.endMonth;
-            }
-        },
         resetMonthRange() {
             this.startMonth = 0;
             this.endMonth = this.maxMonth;
@@ -685,15 +736,14 @@ export default {
             // 使用当前年月作为重置时的结束日期
             const currentDate = new Date();
             this.selectedEndYear = Math.min(currentDate.getFullYear(), 2024);
-            this.selectedEndMonthNum = currentDate.getFullYear() <= 2024 ? currentDate.getMonth() + 1 : 12;
+            this.selectedEndMonthNum =
+                currentDate.getFullYear() <= 2024 ? currentDate.getMonth() + 1 : 12;
         },
         updateStartMonth() {
-            // 根据选择的年月更新startMonth索引
             const targetValue = this.selectedStartYear * 100 + this.selectedStartMonthNum;
-            const index = this.monthList.findIndex(month => month.value === targetValue);
+            const index = this.monthList.findIndex((month) => month.value === targetValue);
             if (index !== -1) {
                 this.startMonth = index;
-                // 确保开始日期不晚于结束日期
                 if (this.startMonth > this.endMonth) {
                     this.endMonth = this.startMonth;
                     this.updateEndSelectors();
@@ -701,12 +751,10 @@ export default {
             }
         },
         updateEndMonth() {
-            // 根据选择的年月更新endMonth索引
             const targetValue = this.selectedEndYear * 100 + this.selectedEndMonthNum;
-            const index = this.monthList.findIndex(month => month.value === targetValue);
+            const index = this.monthList.findIndex((month) => month.value === targetValue);
             if (index !== -1) {
                 this.endMonth = index;
-                // 确保结束日期不早于开始日期
                 if (this.endMonth < this.startMonth) {
                     this.startMonth = this.endMonth;
                     this.updateStartSelectors();
@@ -714,7 +762,6 @@ export default {
             }
         },
         updateStartSelectors() {
-            // 根据startMonth索引更新选择器
             if (this.startMonth >= 0 && this.startMonth < this.monthList.length) {
                 const monthValue = this.monthList[this.startMonth].value;
                 this.selectedStartYear = Math.floor(monthValue / 100);
@@ -722,7 +769,6 @@ export default {
             }
         },
         updateEndSelectors() {
-            // 根据endMonth索引更新选择器
             if (this.endMonth >= 0 && this.endMonth < this.monthList.length) {
                 const monthValue = this.monthList[this.endMonth].value;
                 this.selectedEndYear = Math.floor(monthValue / 100);
@@ -731,71 +777,55 @@ export default {
         },
         applyDatePreset(preset) {
             if (preset.months === null) {
-                // All Time
                 this.resetMonthRange();
             } else {
-                // 计算从当前日期往前的月份
                 const currentDate = new Date();
                 const currentYear = currentDate.getFullYear();
                 const currentMonth = currentDate.getMonth() + 1;
-                
-                // 设置结束日期为当前月份
+
                 let endYear = currentYear;
                 let endMonth = currentMonth;
-                
-                // 确保不超过我们的数据范围
+
                 if (endYear > 2024) {
                     endYear = 2024;
                     endMonth = 12;
                 } else if (endYear === 2024 && endMonth > 12) {
                     endMonth = 12;
                 }
-                
-                // 计算开始日期
+
                 let startYear = endYear;
                 let startMonth = endMonth - preset.months + 1;
-                
+
                 while (startMonth <= 0) {
                     startYear--;
                     startMonth += 12;
                 }
-                
-                // 确保不早于我们的数据范围
+
                 if (startYear < 2020 || (startYear === 2020 && startMonth < 1)) {
                     startYear = 2020;
                     startMonth = 1;
                 }
-                
-                // 更新选择器
+
                 this.selectedStartYear = startYear;
                 this.selectedStartMonthNum = startMonth;
                 this.selectedEndYear = endYear;
                 this.selectedEndMonthNum = endMonth;
-                
-                // 更新索引
+
                 this.updateStartMonth();
                 this.updateEndMonth();
             }
         },
     },
     mounted() {
-        // 初始化月份列表
         this.initializeMonthList();
-        
-        // 设置默认的结束月份为当前月份
-        this.endMonth = this.maxMonth;
-        
-        // 初始化选择器状态
         this.updateStartSelectors();
         this.updateEndSelectors();
-        // 页面加载时自动显示默认结果
         this.filterPapers();
     },
 };
 </script>
 
 <style scoped>
-/* Custom styles for the elegant month selector */
 select:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -808,273 +838,5 @@ select:focus {
 .date-preset-button:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-</style>
-=======
-    computed: {
-        visiblePages() {
-            const pages = [];
-            const maxVisible = 5;
-            let start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
-            let end = Math.min(this.totalPages, start + maxVisible - 1);
-            if (end - start + 1 < maxVisible) {
-                start = Math.max(1, end - maxVisible + 1);
-            }
-            for (let i = start; i <= end; i++) {
-                pages.push(i);
-            }
-            return pages;
-        },
-    },
-    watch: {
-        startMonth() {
-            if (this.hasSearched) {
-                this.currentPage = 1;
-                this.loadSearchResults();
-            }
-        },
-        endMonth() {
-            if (this.hasSearched) {
-                this.currentPage = 1;
-                this.loadSearchResults();
-            }
-        },
-    },
-    methods: {
-        async loadSearchResults() {
-            this.isLoading = true;
-            this.loadError = null;
-            try {
-                const keywords = this.filterKeyword.trim();
-                await this.loadPageData(keywords, this.currentPage);
-            } catch (error) {
-                console.error('Failed to fetch paper data:', error);
-                this.loadError = error.message;
-                this.displayedPapers = [];
-                this.totalPages = 1;
-                this.currentPage = 1;
-            }
-            this.isLoading = false;
-        },
-        async loadPageData(keywordString, page) {
-            let keywords = null;
-
-            if (keywordString && keywordString.trim()) {
-                // 将关键词字符串用逗号分割成数组，支持多关键词搜索
-                keywords = keywordString.trim().split(',').map(kw => kw.trim()).filter(kw => kw.length > 0);
-            }
-
-            const requestBody = {
-                start_month: this.getMonthValue(this.startMonth),
-                end_month: this.getMonthValue(this.endMonth),
-                page: page,
-                keywords: keywords,
-                match_all_keywords: this.matchAllKeywords
-            };
-
-            const response = await fetch(`${data_url}/meta`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result = await response.json();
-            if (result.ret === 'ok' && result.data) {
-                this.displayedPapers = result.data.map((paper) => ({
-                    id: paper.id,
-                    title: paper.title,
-                    authors: paper.authors,
-                    citations: paper.citations,
-                    arxivId: this.extractArxivId(paper.url),
-                    publishedDate: this.formatPublishedDate(paper.publishedMonth),
-                    keywords: paper.keywords || [],
-                    url: paper.url,
-                }));
-                this.totalPages = result.page_count || 1;
-            } else {
-                throw new Error('Invalid API response format');
-            }
-        },
-        async filterPapers() {
-            this.currentPage = 1;
-            this.hasSearched = true;
-            await this.loadSearchResults();
-        },
-        async filterByKeyword(keyword) {
-            this.filterKeyword = keyword;
-            await this.filterPapers();
-        },
-        async clearFilter() {
-            this.filterKeyword = '';
-            this.currentPage = 1;
-            this.hasSearched = true;
-            await this.loadSearchResults();
-        },
-        async changePage(page) {
-            if (page < 1 || page > this.totalPages || page === this.currentPage) {
-                return;
-            }
-            this.currentPage = page;
-            await this.loadSearchResults();
-        },
-        async goToFirstPage() {
-            await this.changePage(1);
-        },
-        async goToLastPage() {
-            await this.changePage(this.totalPages);
-        },
-        async goToPrevPage() {
-            await this.changePage(this.currentPage - 1);
-        },
-        async goToNextPage() {
-            await this.changePage(this.currentPage + 1);
-        },
-        formatNumber(num) {
-            return num.toLocaleString();
-        },
-        extractArxivId(url) {
-            const match = url.match(/arxiv\.org\/pdf\/([^\/]+)/);
-            return match ? match[1] : '';
-        },
-        formatPublishedDate(publishedMonth) {
-            if (publishedMonth && publishedMonth.length === 6) {
-                const year = publishedMonth.substring(0, 4);
-                const month = publishedMonth.substring(4, 6);
-                return `${year}-${month}-01`;
-            }
-            return '';
-        },
-        openPaperLink(paper) {
-            if (paper.url) {
-                window.open(paper.url, '_blank');
-            } else if (paper.arxivId) {
-                window.open(`https://arxiv.org/abs/${paper.arxivId}`, '_blank');
-            }
-        },
-        truncateAuthors(authors, maxLength) {
-            if (!authors || authors.length <= maxLength) {
-                return authors;
-            }
-            return authors.substring(0, maxLength) + '...';
-        },
-        formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('en-US');
-        },
-        toggleKeywordsDropdown() {
-            this.showKeywordsDropdown = !this.showKeywordsDropdown;
-        },
-        selectKeywordOption(value) {
-            this.matchAllKeywords = value;
-            this.showKeywordsDropdown = false;
-        },
-        initializeMonthList() {
-            // 生成从2020年1月到2024年12月的月份列表
-            this.monthList = [];
-            for (let year = 2020; year <= 2024; year++) {
-                const maxMonth = year === 2024 ? 12 : 12;
-                for (let month = 1; month <= maxMonth; month++) {
-                    this.monthList.push({
-                        value: year * 100 + month,
-                        display: `${year}-${month.toString().padStart(2, '0')}`
-                    });
-                }
-            }
-        },
-        getMonthDisplay(index) {
-            if (index >= 0 && index < this.monthList.length) {
-                return this.monthList[index].display;
-            }
-            return '';
-        },
-        getMonthValue(index) {
-            if (index >= 0 && index < this.monthList.length) {
-                return this.monthList[index].value;
-            }
-            return null;
-        },
-        onStartMonthChange() {
-            // 确保开始月份不大于结束月份
-            if (this.startMonth > this.endMonth) {
-                this.endMonth = this.startMonth;
-            }
-        },
-        onEndMonthChange() {
-            // 确保结束月份不小于开始月份
-            if (this.endMonth < this.startMonth) {
-                this.startMonth = this.endMonth;
-            }
-        },
-        resetMonthRange() {
-            this.startMonth = 0;
-            this.endMonth = this.maxMonth;
-        },
-    },
-    mounted() {
-        // 初始化月份列表
-        this.initializeMonthList();
-        // 页面加载时自动显示默认结果
-        this.filterPapers();
-    },
-};
-</script>
-
-<style scoped>
-/* Custom range slider styles */
-.slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    pointer-events: none;
-}
-
-.slider-thumb::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #3b82f6;
-    border: 2px solid #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    pointer-events: all;
-    position: relative;
-    z-index: 1;
-}
-
-.slider-thumb::-moz-range-thumb {
-    height: 20px;
-    width: 20px;
-    border-radius: 50%;
-    background: #3b82f6;
-    border: 2px solid #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    pointer-events: all;
-    border: none;
-}
-
-.slider-thumb::-webkit-slider-track {
-    background: transparent;
-}
-
-.slider-thumb::-moz-range-track {
-    background: transparent;
-}
-
-.slider-thumb:focus {
-    outline: none;
-}
-
-.slider-thumb:focus::-webkit-slider-thumb {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-.slider-thumb:focus::-moz-range-thumb {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 </style>
