@@ -13,7 +13,7 @@
                             @click="resetMonthRange"
                             class="text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors"
                         >
-                            Reset to All Time
+                            Reset to Last Year
                         </button>
                     </div>
                     <!-- Elegant Month Range Selector -->
@@ -476,7 +476,7 @@ export default {
         const currentDate = new Date();
         const currentYear = currentDate.getFullYear();
         const currentMonth = currentDate.getMonth() + 1;
-        
+
         return {
             filterKeyword: '',
             matchAllKeywords: false,
@@ -711,7 +711,7 @@ export default {
 
             this.maxMonth = this.monthList.length - 1;
             this.endMonth = this.maxMonth;
-            
+
             this.selectedEndYear = currentYear;
             this.selectedEndMonthNum = currentMonth;
         },
@@ -728,15 +728,38 @@ export default {
             return null;
         },
         resetMonthRange() {
-            this.startMonth = 0;
-            this.endMonth = this.maxMonth;
-            this.selectedStartYear = 2020;
-            this.selectedStartMonthNum = 1;
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth() + 1;
+
+            // Calculate Last Year range
+            let startYear = currentYear;
+            let startMonth = currentMonth - 12 + 1;
+
+            while (startMonth <= 0) {
+                startYear--;
+                startMonth += 12;
+            }
+
+            if (startYear < 2020 || (startYear === 2020 && startMonth < 1)) {
+                startYear = 2020;
+                startMonth = 1;
+            }
+
+            this.selectedStartYear = startYear;
+            this.selectedStartMonthNum = startMonth;
             this.selectedEndYear = currentYear;
             this.selectedEndMonthNum = currentMonth;
+
+            // Update month indices
+            const targetStartValue = startYear * 100 + startMonth;
+            const startIndex = this.monthList.findIndex(
+                (month) => month.value === targetStartValue,
+            );
+            if (startIndex !== -1) {
+                this.startMonth = startIndex;
+            }
+            this.endMonth = this.maxMonth;
         },
         updateStartMonth() {
             const targetValue = this.selectedStartYear * 100 + this.selectedStartMonthNum;
@@ -815,7 +838,6 @@ export default {
         this.filterPapers();
     },
 };
-
 </script>
 <style scoped>
 select:focus {
