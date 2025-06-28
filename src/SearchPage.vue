@@ -824,7 +824,25 @@ export default {
         },
         applyDatePreset(preset) {
             if (preset.months === null) {
-                this.resetMonthRange();
+                // All Time: Set start to 2020-01 and end to current month
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1;
+
+                this.selectedStartYear = 2020;
+                this.selectedStartMonthNum = 1;
+                this.selectedEndYear = currentYear;
+                this.selectedEndMonthNum = currentMonth;
+
+                // Update month indices
+                const targetStartValue = 2020 * 100 + 1; // 2020-01
+                const startIndex = this.monthList.findIndex(
+                    (month) => month.value === targetStartValue,
+                );
+                if (startIndex !== -1) {
+                    this.startMonth = startIndex;
+                }
+                this.endMonth = this.maxMonth;
             } else {
                 const currentDate = new Date();
                 const currentYear = currentDate.getFullYear();
