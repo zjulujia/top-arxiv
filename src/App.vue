@@ -73,7 +73,7 @@
                             : 'text-gray-600 hover:bg-gray-200'
                     ]"
                 >
-                    📅 Monthly
+                    📅 Recommended
                 </button>
                 <button
                     @click="switchView('search')"
@@ -132,7 +132,6 @@
                         </div>
                     </div>
                 </div>
-                =======
             </div>
             <!-- Results -->
             <div v-if="displayedPapers.length > 0 && !isLoading" class="mb-4">
